@@ -113,7 +113,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                         connection.Open();
                         Console.WriteLine(connection.ConnectionString);
                         // Your SQL query to retrieve user data
-                        string sqlQuery = "SELECT table_name FROM information_schema.tables";
+                        string checkTableQuery = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';";
 
                         Console.WriteLine($"Connection State: {connection.State}");
                         Console.WriteLine($"Database Schema: {connection.Database}");
