@@ -124,25 +124,26 @@ namespace WorldsAdriftServer.Handlers.DataHandler
 
                                     while (reader.Read())
                                     {
-                                        // Assuming your UserData table has 'username' and 'email' columns
+                                        // Assuming your UserData table has 'userKey', 'characterUID', and 'sessionToken' columns
                                         JObject userData = new JObject
-                                {
-                                    { "username", reader["username"].ToString() },
-                                    { "email", reader["email"].ToString() }
-                                    // Add more fields as needed
-                                };
+                                        {
+                                            { "userKey", reader["userKey"].ToString() },
+                                            { "characterUID", reader["characterUID"].ToString() },
+                                            { "sessionToken", reader["sessionToken"].ToString() }
+                                            // Add more fields as needed
+                                        };
 
                                         userDataArray.Add(userData);
                                     }
 
                                     // Include session ID in the response
                                     JObject response = new JObject
-                            {
-                                { "status", "success" },
-                                { "message", "User data retrieved successfully" },
-                                { "sessionUid", RequestRouterHandler.sessionId },
-                                { "userData", userDataArray }
-                            };
+                                    {
+                                        { "status", "success" },
+                                        { "message", "User data retrieved successfully" },
+                                        { "sessionUid", RequestRouterHandler.sessionId },
+                                        { "userData", userDataArray }
+                                    };
 
                                     // Convert response to JSON string
                                     string jsonResponse = response.ToString();
@@ -170,8 +171,6 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                 {
                     // Log the exception for analysis
                     Console.WriteLine($"Npgsql Exception: {ex.Message}");
-                    // You might want to log the full stack trace and any other relevant details
-                    // LogException(ex);
 
                     // Retry only for specific Npgsql exceptions that indicate transient issues
                     if (IsTransientNpgsqlException(ex))
@@ -191,8 +190,6 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                 {
                     // Log the exception for analysis
                     Console.WriteLine($"Exception: {ex.Message}");
-                    // You might want to log the full stack trace and any other relevant details
-                    // LogException(ex);
 
                     // Retry only for specific exceptions that indicate transient issues
                     if (IsTransientException(ex))
@@ -215,19 +212,18 @@ namespace WorldsAdriftServer.Handlers.DataHandler
             // You might want to set the status code or take other actions
         }
 
-        private static bool IsTransientException(Exception ex)
-        {
-            // You can customize this method based on the specific exceptions you want to retry
-            return ex is TimeoutException || ex is IOException || (ex is NpgsqlException && IsTransientNpgsqlException((NpgsqlException)ex)); // Example: Retry for timeouts, IO errors, or specific Npgsql exceptions
-        }
-
-        // Example method to check if an Npgsql exception is transient
         private static bool IsTransientNpgsqlException(NpgsqlException ex)
         {
-            // You can customize this method based on the specific Npgsql exceptions you want to retry
-            return ex.InnerException is SocketException || ex.InnerException is IOException; // Example: Retry for network-related errors
+            // Implement your logic to determine if the NpgsqlException is transient
+            // You might want to check specific error codes, messages, or other properties
+            return true; // Replace with your actual logic
         }
 
-
+        private static bool IsTransientException(Exception ex)
+        {
+            // Implement your logic to determine if the exception is transient
+            // You might want to check specific error codes, messages, or other properties
+            return true; // Replace with your actual logic
+        }
     }
 }
