@@ -113,7 +113,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                         connection.Open();
                         Console.WriteLine(connection.ConnectionString);
                         // Your SQL query to retrieve user data
-                        string sqlQuery = "SELECT * FROM schema_name.table_name;";
+                        string sqlQuery = "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'UserData');";
 
 
                         using (NpgsqlCommand command = new NpgsqlCommand(sqlQuery, connection))
