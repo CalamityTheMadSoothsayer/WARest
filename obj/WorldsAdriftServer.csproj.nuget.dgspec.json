@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\s3v3r\\source\\repos\\WarServer\\WorldsAdriftServer\\WorldsAdriftServer.csproj": {}
+    "C:\\Users\\s3v3r\\source\\repos\\WarRepo\\WorldsAdriftServer.csproj": {}
   },
   "projects": {
-    "C:\\Users\\s3v3r\\source\\repos\\WarServer\\WorldsAdriftServer\\WorldsAdriftServer.csproj": {
+    "C:\\Users\\s3v3r\\source\\repos\\WarRepo\\WorldsAdriftServer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\s3v3r\\source\\repos\\WarServer\\WorldsAdriftServer\\WorldsAdriftServer.csproj",
+        "projectUniqueName": "C:\\Users\\s3v3r\\source\\repos\\WarRepo\\WorldsAdriftServer.csproj",
         "projectName": "WorldsAdriftServer",
-        "projectPath": "C:\\Users\\s3v3r\\source\\repos\\WarServer\\WorldsAdriftServer\\WorldsAdriftServer.csproj",
+        "projectPath": "C:\\Users\\s3v3r\\source\\repos\\WarRepo\\WorldsAdriftServer.csproj",
         "packagesPath": "C:\\Users\\s3v3r\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\s3v3r\\source\\repos\\WarServer\\WorldsAdriftServer\\obj\\",
+        "outputPath": "C:\\Users\\s3v3r\\source\\repos\\WarRepo\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
