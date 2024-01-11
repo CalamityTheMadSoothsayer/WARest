@@ -14,7 +14,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
         public static readonly ConcurrentDictionary<string, JObject> userDataDictionary = new ConcurrentDictionary<string, JObject>();
         public static string connectionString = $"Host={RequestRouterHandler.serverName};Port=5432;Database={RequestRouterHandler.dbName};Username={RequestRouterHandler.username};Password={RequestRouterHandler.password};";
 
-        private static void StoreUserDataInApi(string SessionId, string userKey)
+        private static void StoreUserData(string SessionId, string userKey)
         {
             int retryCount = 3;
             bool success = false;
