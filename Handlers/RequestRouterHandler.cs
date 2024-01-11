@@ -93,6 +93,10 @@ namespace WorldsAdriftServer.Handlers
                     Console.WriteLine($"URL unhandled for request: \n\r {request}");
                 }
             }
+            else
+            {
+                Console.WriteLine("Config failed to load");
+            }
         }
 
         protected override void OnReceivedRequestError( HttpRequest request, string error )
