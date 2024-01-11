@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Net;
 using System.Text;
+using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -103,66 +104,60 @@ namespace WorldsAdriftServer.Handlers.DataHandler
             {
                 try
                 {
-                    using (var httpClient = new HttpClient())
+                    // Your database connection string
+                    string connectionString = $"Data Source={RequestRouterHandler.serverName};Initial Catalog={RequestRouterHandler.dbName};User Id={RequestRouterHandler.userName};Password={RequestRouterHandler.password};";
+
+                    using (SqlConnection connection = new SqlConnection(connectionString))
                     {
-                        HttpResponseMessage response = httpClient.GetAsync($"{ApiBaseUrl}/getUserData.php").Result;
+                        connection.Open();
 
-                        if (response.IsSuccessStatusCode)
+                        // Your SQL query to retrieve user data
+                        string sqlQuery = "SELECT * FROM UserData";
+
+                        using (SqlCommand command = new SqlCommand(sqlQuery, connection))
                         {
-                            var json = response.Content.ReadAsStringAsync().Result;
-                            var responseObject = JsonConvert.DeserializeObject<JObject>(json);
-
-                            if (responseObject != null)
+                            using (SqlDataReader reader = command.ExecuteReader())
                             {
-                                // Print all data received in the response
-                                Console.WriteLine($"Message: {responseObject["message"]}");
-                                Console.WriteLine($"SessionUid: {responseObject["sessionUid"]}");
-
-                                RequestRouterHandler.sessionId = responseObject["sessionUid"].ToString();
-
-                                var userDataArray = responseObject["userData"] as JArray;
-                                
-                                lock (apiLock)
+                                if (reader.HasRows)
                                 {
-                                    DataStorage.userDataDictionary.Clear();
-                                    foreach (var entry in userDataArray)
-                                    {
-                                        var key = entry["userKey"].ToString();
-                                        DataStorage.userDataDictionary.TryAdd(key, (JObject)entry);
-                                    }
-                                }
+                                    JArray userDataArray = new JArray();
 
-                                // Extract userKey from the first entry in the data list
-                                var userKey = userDataArray.FirstOrDefault()?["userKey"]?.ToString();
-                                if (!string.IsNullOrEmpty(userKey))
-                                {
-                                    // userKey gets assigned by request, just check if it matches
-                                    if (userDataArray != null)
+                                    while (reader.Read())
                                     {
-                                        foreach (var userDataEntry in userDataArray)
+                                        // Assuming your UserData table has 'username' and 'email' columns
+                                        JObject userData = new JObject
                                         {
-                                            if(userDataEntry["userKey"].ToString() == userKey)
-                                            {
-                                                success = true;
-                                            }
-                                            else
-                                            {
-                                                success = false;
-                                            }
-                                        }
-                                    }
-                                }
+                                            { "username", reader["username"].ToString() },
+                                            { "email", reader["email"].ToString() }
+                                            // Add more fields as needed
+                                        };
 
-                                Console.WriteLine($"\n\r Success: Loaded user data from API");
-                                break;
-                            }
-                            else
-                            {
-                                Console.WriteLine($"Error loading user data: {response.StatusCode}");
-                                RequestRouterHandler.status = response.StatusCode;
+                                        userDataArray.Add(userData);
+                                    }
+
+                                    // Include session ID in the response
+                                    JObject response = new JObject
+                                    {
+                                        { "status", "success" },
+                                        { "message", "User data retrieved successfully" },
+                                        { "sessionUid", RequestRouterHandler.sessionId },
+                                        { "userData", userDataArray }
+                                    };
+
+                                    // Convert response to JSON string
+                                    string jsonResponse = response.ToString();
+
+                                    // Handle the jsonResponse as needed (e.g., send it back in the HTTP response)
+                                    Console.WriteLine(jsonResponse);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("No user data found.");
+                                }
                             }
                         }
                     }
+                    
                 }
                 catch (Exception ex)
                 {

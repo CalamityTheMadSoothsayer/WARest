@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using System.Xml;
+using System.Xml.Linq;
 using NetCoreServer;
 using Newtonsoft.Json.Linq;
 using WorldsAdriftServer.Handlers.Authentication;
@@ -23,6 +24,11 @@ namespace WorldsAdriftServer.Handlers
         public static HttpStatusCode status;
         public static List<CharacterCreationData> characterList = new List<CharacterCreationData>();
         public static CharacterListResponse CharacterResponse = new CharacterListResponse(characterList);
+
+        public static string serverName;
+        public static string dbName;
+        public static string username;
+        public static string password;
 
         public RequestRouterHandler( HttpServer server ) : base(server) 
         {
@@ -129,10 +135,10 @@ namespace WorldsAdriftServer.Handlers
                 // Check for null before accessing node values
                 if (serverNode != null && dbNode != null && userNode != null && passwordNode != null)
                 {
-                    string serverName = serverNode.InnerText;
-                    string dbName = dbNode.InnerText;
-                    string username = userNode.InnerText;
-                    string password = passwordNode.InnerText;
+                    serverName = serverNode.InnerText;
+                    dbName = dbNode.InnerText;
+                    username = userNode.InnerText;
+                    password = passwordNode.InnerText;
 
                     // Use database connection details as needed
                     return true;
