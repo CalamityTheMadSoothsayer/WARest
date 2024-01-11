@@ -104,7 +104,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                 try
                 {
                     // Your database connection string
-                    string connectionString = $"Data Source={RequestRouterHandler.serverName};Initial Catalog={RequestRouterHandler.dbName};User Id={RequestRouterHandler.userName};Password={RequestRouterHandler.password};";
+                    string connectionString = $"Data Source={RequestRouterHandler.serverName};Initial Catalog={RequestRouterHandler.dbName};User Id={RequestRouterHandler.userName};Password={RequestRouterHandler.password};Port=3306;";
 
                     using (SqlConnection connection = new SqlConnection(connectionString))
                     {
@@ -124,24 +124,24 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                                     while (reader.Read())
                                     {
                                         // Assuming your UserData table has 'username' and 'email' columns
-                                        JObject userData = new JObject
-                                {
-                                    { "username", reader["username"].ToString() },
-                                    { "email", reader["email"].ToString() }
-                                    // Add more fields as needed
-                                };
+                                                JObject userData = new JObject
+                                        {
+                                            { "username", reader["username"].ToString() },
+                                            { "email", reader["email"].ToString() }
+                                            // Add more fields as needed
+                                        };
 
                                         userDataArray.Add(userData);
                                     }
 
                                     // Include session ID in the response
                                     JObject response = new JObject
-                            {
-                                { "status", "success" },
-                                { "message", "User data retrieved successfully" },
-                                { "sessionUid", RequestRouterHandler.sessionId },
-                                { "userData", userDataArray }
-                            };
+                                    {
+                                        { "status", "success" },
+                                        { "message", "User data retrieved successfully" },
+                                        { "sessionUid", RequestRouterHandler.sessionId },
+                                        { "userData", userDataArray }
+                                    };
 
                                     // Convert response to JSON string
                                     string jsonResponse = response.ToString();
