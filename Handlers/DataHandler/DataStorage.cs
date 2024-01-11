@@ -130,7 +130,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                                         string tableName = reader["table_name"].ToString();
                                         Console.WriteLine($"Table Name: {tableName}");
 
-                                        userDataArray.Add(userData);
+                                        
                                     }
 
                                     // Include session ID in the response
