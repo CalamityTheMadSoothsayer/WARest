@@ -121,10 +121,10 @@ namespace WorldsAdriftServer.Handlers
                 xmlDoc.Load(xmlFilePath);
 
                 // Extract database connection details
-                XmlNode serverNode = xmlDoc.SelectSingleNode("/DatabaseConfiguration/ServerName");
-                XmlNode dbNode = xmlDoc.SelectSingleNode("/DatabaseConfiguration/DatabaseName");
-                XmlNode userNode = xmlDoc.SelectSingleNode("/DatabaseConfiguration/Username");
-                XmlNode passwordNode = xmlDoc.SelectSingleNode("/DatabaseConfiguration/Password");
+                XmlNode serverNode = xmlDoc.SelectSingleNode("/configuration/database/servername");
+                XmlNode dbNode = xmlDoc.SelectSingleNode("/configuration/database/dbname");
+                XmlNode userNode = xmlDoc.SelectSingleNode("/configuration/database/username");
+                XmlNode passwordNode = xmlDoc.SelectSingleNode("/configuration/database/password");
 
                 // Check for null before accessing node values
                 if (serverNode != null && dbNode != null && userNode != null && passwordNode != null)
@@ -150,6 +150,5 @@ namespace WorldsAdriftServer.Handlers
                 return false;
             }
         }
-
     }
 }
