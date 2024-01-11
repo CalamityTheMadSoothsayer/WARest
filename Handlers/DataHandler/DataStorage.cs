@@ -11,83 +11,105 @@ namespace WorldsAdriftServer.Handlers.DataHandler
     public class DataStorage
     {
         public static readonly ConcurrentDictionary<string, JObject> userDataDictionary = new ConcurrentDictionary<string, JObject>();
-        public static readonly object apiLock = new object();
-        public const string ApiBaseUrl = "https://projexstudio.net"; // API endpoint, store this in config so it can be changed
+        public static string connectionString = $"Host={RequestRouterHandler.serverName};Port=5432;Database={RequestRouterHandler.dbName};Username={RequestRouterHandler.username};Password={RequestRouterHandler.password};";
 
-        public static void StoreUserData( string SessionId, string userKey )
+        public static void StoreUserData(string SessionId, string userKey)
         {
             int retryCount = 3;
             bool success = false;
 
             while (retryCount > 0)
             {
-                lock (apiLock)
+                try
                 {
-                    using (var httpClient = new HttpClient())
+                    using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
                     {
-                        var userData = new
+                        connection.Open();
+
+                        // Check if the character already exists for the player
+                        string checkCharacterSql = $"SELECT userKey FROM CharacterDetails WHERE userKey = '{userKey}'";
+                        using (NpgsqlCommand checkCharacterCommand = new NpgsqlCommand(checkCharacterSql, connection))
+                        using (NpgsqlDataReader checkCharacterReader = checkCharacterCommand.ExecuteReader())
                         {
-                            UserKey = userKey,
-                            sessionId = SessionId
-                        };
-
-                        var jsonData = JsonConvert.SerializeObject(userData);
-                        var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-
-                        // Default to failed
-                        HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
-
-                        // Make a POST request to API endpoint to store user data
-                        try
-                        {
-                            response = httpClient.PostAsync($"{ApiBaseUrl}/storeUserData.php", content).Result;
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error making POST request: {ex.Message}");
-                        }
-
-                        if (response.IsSuccessStatusCode)
-                        {
-                            var responseContent = response.Content.ReadAsStringAsync().Result;
-
-                            try
+                            if (checkCharacterReader.HasRows)
                             {
-                                var responseObject = JsonConvert.DeserializeObject<JObject>(responseContent);
+                                // Character already exists, send appropriate response
+                                Console.WriteLine("Character data already exists.");
+                                return;
+                            }
+                        }
 
-                                if (responseObject != null && responseObject["status"].ToString() == "success")
+                        // Check if the server session is set
+                        if (String.IsNullOrEmpty(RequestRouterHandler.sessionId))
+                        {
+                            // Game Session is not set, update the session token in UserData using a prepared statement
+                            string updateSessionSql = "UPDATE UserData SET sessionToken = @sessionId WHERE userKey = @userKey";
+                            using (NpgsqlCommand updateSessionCommand = new NpgsqlCommand(updateSessionSql, connection))
+                            {
+                                updateSessionCommand.Parameters.AddWithValue("@sessionId", SessionId);
+                                updateSessionCommand.Parameters.AddWithValue("@userKey", userKey);
+
+                                if (updateSessionCommand.ExecuteNonQuery() > 0)
                                 {
-                                    Console.WriteLine($"\n\r Success: {responseObject["message"]}");
-                                    RequestRouterHandler.status = response.StatusCode;
+                                    // Store userKey in the session
+                                    RequestRouterHandler.sessionId = SessionId;
+                                    Console.WriteLine("Session updated successfully.");
                                     success = true;
-                                    break; 
+                                    break;
                                 }
                                 else
                                 {
-                                    Console.WriteLine($"Error storing user data: {response.StatusCode}");
-                                    RequestRouterHandler.status = response.StatusCode;
-                                    // Handle error accordingly
+                                    // Include the complete error message in the response
+                                    Console.WriteLine($"Error updating session: {updateSessionSql}");
                                 }
-                            }
-                            catch (JsonReaderException ex)
-                            {
-                                Console.WriteLine($"FAILED to store user data. [REASON] {ex.Message}");
-                                RequestRouterHandler.status = response.StatusCode;
-                                break; 
                             }
                         }
                         else
                         {
-                            Console.WriteLine($"Error storing user data: {response.StatusCode}");
-                            RequestRouterHandler.status = response.StatusCode;
+                            // Session is already set, send appropriate response
+                            Console.WriteLine("Session already set.");
+                            return;
                         }
                     }
                 }
+                catch (NpgsqlException ex)
+                {
+                    // Log the exception for analysis
+                    Console.WriteLine($"Npgsql Exception: {ex.Message}");
 
-                // Retry logic
-                retryCount--;
-                Console.WriteLine($"Retrying... {retryCount} attempts remaining");
-                System.Threading.Thread.Sleep(1000); // Sleep for 1 second before retrying
+                    // Retry only for specific Npgsql exceptions that indicate transient issues
+                    if (IsTransientNpgsqlException(ex))
+                    {
+                        // Decrement the retry count
+                        retryCount--;
+                        Console.WriteLine($"Retrying... {retryCount} attempts remaining");
+                        System.Threading.Thread.Sleep(1000); // Sleep for 1 second before retrying
+                    }
+                    else
+                    {
+                        // Break out of the retry loop for non-transient exceptions
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Log the exception for analysis
+                    Console.WriteLine($"Exception: {ex.Message}");
+
+                    // Retry only for specific exceptions that indicate transient issues
+                    if (IsTransientException(ex))
+                    {
+                        // Decrement the retry count
+                        retryCount--;
+                        Console.WriteLine($"Retrying... {retryCount} attempts remaining");
+                        System.Threading.Thread.Sleep(1000); // Sleep for 1 second before retrying
+                    }
+                    else
+                    {
+                        // Break out of the retry loop for non-transient exceptions
+                        break;
+                    }
+                }
             }
 
             if (!success)
@@ -104,9 +126,6 @@ namespace WorldsAdriftServer.Handlers.DataHandler
             {
                 try
                 {
-                    // Your database connection string for PostgreSQL
-                    string connectionString = $"Host={RequestRouterHandler.serverName};Port=5432;Database={RequestRouterHandler.dbName};Username={RequestRouterHandler.username};Password={RequestRouterHandler.password};";
-
                     using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
                     {
                         connection.Open();
