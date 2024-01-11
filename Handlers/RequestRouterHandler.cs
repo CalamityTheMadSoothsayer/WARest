@@ -110,7 +110,7 @@ namespace WorldsAdriftServer.Handlers
             try
             {
                 // Specify the full path to the XML file
-                string xmlFilePath = "./home/rdpuser/WarWebServer/db.txt";
+                string xmlFilePath = "./db.txt";
 
                 // Load the XML file
                 XmlDocument xmlDoc = new XmlDocument();
