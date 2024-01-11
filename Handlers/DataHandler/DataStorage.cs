@@ -105,106 +105,30 @@ namespace WorldsAdriftServer.Handlers.DataHandler
             {
                 try
                 {
-                    // Your database connection string for PostgreSQL
-                    string connectionString = $"Host={RequestRouterHandler.serverName};Database={RequestRouterHandler.dbName};Username={RequestRouterHandler.username};Password={RequestRouterHandler.password};";
+                    string connectionString = "Host=localhost;Database=wardatabase;Username=waradmin;Password=warpassword;";
 
                     using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
                     {
                         connection.Open();
-                        Console.WriteLine(connection.ConnectionString);
-                        // Your SQL query to retrieve user data
-                        string sqlQuery = "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'UserData');";
+                        Console.WriteLine("Connection opened successfully!");
 
-
-                        using (NpgsqlCommand command = new NpgsqlCommand(sqlQuery, connection))
+                        // Now try to execute a simple query
+                        string query = "SELECT * FROM userdata";
+                        using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
                         {
                             using (NpgsqlDataReader reader = command.ExecuteReader())
                             {
-                                if (reader.HasRows)
+                                while (reader.Read())
                                 {
-                                    JArray userDataArray = new JArray();
-
-                                    while (reader.Read())
-                                    {
-                                        // Assuming your UserData table has 'username' and 'email' columns
-                                        string tableName = reader["table_name"].ToString();
-                                        Console.WriteLine($"Table Name: {tableName}");
-
-                                        
-                                    }
-
-                                    // Include session ID in the response
-                                    JObject response = new JObject
-                                    {
-                                        { "status", "success" },
-                                        { "message", "User data retrieved successfully" },
-                                        { "sessionUid", RequestRouterHandler.sessionId },
-                                        { "userData", userDataArray }
-                                    };
-
-                                    // Convert response to JSON string
-                                    string jsonResponse = response.ToString();
-
-                                    // Handle the jsonResponse as needed (e.g., send it back in the HTTP response)
-                                    Console.WriteLine(jsonResponse);
-
-                                    // Operation succeeded, break out of the retry loop
-                                    return;
-                                }
-                                else
-                                {
-                                    Console.WriteLine("No user data found.");
+                                    Console.WriteLine($"Username: {reader["username"]}, Email: {reader["email"]}");
                                 }
                             }
                         }
                     }
-
-                    // If no exception occurred, decrement the retry count
-                    retryCount--;
-                    Console.WriteLine($"Retrying... {retryCount} attempts remaining");
-                    System.Threading.Thread.Sleep(1000); // Sleep for 1 second before retrying
-                }
-                catch (NpgsqlException ex)
-                {
-                    // Log the exception for analysis
-                    Console.WriteLine($"Npgsql Exception: {ex.Message}");
-                    // You might want to log the full stack trace and any other relevant details
-                    // LogException(ex);
-
-                    // Retry only for specific Npgsql exceptions that indicate transient issues
-                    if (IsTransientNpgsqlException(ex))
-                    {
-                        // Decrement the retry count
-                        retryCount--;
-                        Console.WriteLine($"Retrying... {retryCount} attempts remaining");
-                        System.Threading.Thread.Sleep(1000); // Sleep for 1 second before retrying
-                    }
-                    else
-                    {
-                        // Break out of the retry loop for non-transient exceptions
-                        break;
-                    }
                 }
                 catch (Exception ex)
                 {
-                    // Log the exception for analysis
                     Console.WriteLine($"Exception: {ex.Message}");
-                    // You might want to log the full stack trace and any other relevant details
-                    // LogException(ex);
-
-                    // Retry only for specific exceptions that indicate transient issues
-                    if (IsTransientException(ex))
-                    {
-                        // Decrement the retry count
-                        retryCount--;
-                        Console.WriteLine($"Retrying... {retryCount} attempts remaining");
-                        System.Threading.Thread.Sleep(1000); // Sleep for 1 second before retrying
-                    }
-                    else
-                    {
-                        // Break out of the retry loop for non-transient exceptions
-                        break;
-                    }
                 }
             }
 
