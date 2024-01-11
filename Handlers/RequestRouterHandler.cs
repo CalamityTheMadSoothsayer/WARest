@@ -60,6 +60,12 @@ namespace WorldsAdriftServer.Handlers
                     // Extract userKey
                     string? userKey = requestBody["steamCredential"]?["userKey"]?.ToString()?.Trim();
 
+                    if(userKey != null)
+                    {
+                        HttpSession thisSession = new HttpSession(Server);
+                        sessionId = thisSession.Id.ToString();
+                    }
+
                     // create session and begin storing user
                     DataStorage.StoreUserData(sessionId, userKey);
 

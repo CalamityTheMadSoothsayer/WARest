@@ -52,6 +52,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                                     // Store userKey in the session
                                     RequestRouterHandler.sessionId = SessionId;
                                     Console.WriteLine("Session updated successfully.");
+                                    retryCount = 0;
                                     success = true;
                                     break;
                                 }
