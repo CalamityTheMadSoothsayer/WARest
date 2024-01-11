@@ -14,7 +14,7 @@ namespace WorldsAdriftServer
             //server.AddStaticContent() here to add some filesystem path to serve
             restServer.Start();
 
-            Console.WriteLine("enter something to stop");
+            Console.WriteLine("Press Any key to stop");
             Console.ReadKey();
 
             restServer.Stop();
