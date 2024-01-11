@@ -98,7 +98,6 @@ namespace WorldsAdriftServer.Handlers.DataHandler
         public static void LoadUserDataFromApi()
         {
             int retryCount = 3;
-            bool success = false;
 
             while (retryCount > 0)
             {
@@ -126,29 +125,32 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                                     {
                                         // Assuming your UserData table has 'username' and 'email' columns
                                         JObject userData = new JObject
-                                        {
-                                            { "username", reader["username"].ToString() },
-                                            { "email", reader["email"].ToString() }
-                                            // Add more fields as needed
-                                        };
+                                {
+                                    { "username", reader["username"].ToString() },
+                                    { "email", reader["email"].ToString() }
+                                    // Add more fields as needed
+                                };
 
                                         userDataArray.Add(userData);
                                     }
 
                                     // Include session ID in the response
                                     JObject response = new JObject
-                                    {
-                                        { "status", "success" },
-                                        { "message", "User data retrieved successfully" },
-                                        { "sessionUid", RequestRouterHandler.sessionId },
-                                        { "userData", userDataArray }
-                                    };
+                            {
+                                { "status", "success" },
+                                { "message", "User data retrieved successfully" },
+                                { "sessionUid", RequestRouterHandler.sessionId },
+                                { "userData", userDataArray }
+                            };
 
                                     // Convert response to JSON string
                                     string jsonResponse = response.ToString();
 
                                     // Handle the jsonResponse as needed (e.g., send it back in the HTTP response)
                                     Console.WriteLine(jsonResponse);
+
+                                    // Operation succeeded, break out of the retry loop
+                                    return;
                                 }
                                 else
                                 {
@@ -157,29 +159,73 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                             }
                         }
                     }
-                    
+
+                    // If no exception occurred, decrement the retry count
+                    retryCount--;
+                    Console.WriteLine($"Retrying... {retryCount} attempts remaining");
+                    System.Threading.Thread.Sleep(1000); // Sleep for 1 second before retrying
+                }
+                catch (SqlException ex)
+                {
+                    // Log the exception for analysis
+                    Console.WriteLine($"SQL Exception: {ex.Message}");
+                    // You might want to log the full stack trace and any other relevant details
+                    // LogException(ex);
+
+                    // Retry only for specific SQL exceptions that indicate transient issues
+                    if (IsTransientSqlException(ex))
+                    {
+                        // Decrement the retry count
+                        retryCount--;
+                        Console.WriteLine($"Retrying... {retryCount} attempts remaining");
+                        System.Threading.Thread.Sleep(1000); // Sleep for 1 second before retrying
+                    }
+                    else
+                    {
+                        // Break out of the retry loop for non-transient exceptions
+                        break;
+                    }
                 }
                 catch (Exception ex)
                 {
-                    var response = new HttpResponseMessage();
-                    response.StatusCode = HttpStatusCode.InternalServerError;
-                    Console.WriteLine($"Error loading user data: {ex.Message}");
-                    RequestRouterHandler.status = response.StatusCode;
+                    // Log the exception for analysis
+                    Console.WriteLine($"Exception: {ex.Message}");
+                    // You might want to log the full stack trace and any other relevant details
+                    // LogException(ex);
+
+                    // Retry only for specific exceptions that indicate transient issues
+                    if (IsTransientException(ex))
+                    {
+                        // Decrement the retry count
+                        retryCount--;
+                        Console.WriteLine($"Retrying... {retryCount} attempts remaining");
+                        System.Threading.Thread.Sleep(1000); // Sleep for 1 second before retrying
+                    }
+                    else
+                    {
+                        // Break out of the retry loop for non-transient exceptions
+                        break;
+                    }
                 }
-
-                // Retry logic
-                retryCount--;
-                Console.WriteLine($"Retrying... {retryCount} attempts remaining");
-                System.Threading.Thread.Sleep(1000); // Sleep for 1 second before retrying
             }
 
-            if (!success)
-            {
-                var response = new HttpResponseMessage();
-                response.StatusCode = HttpStatusCode.InternalServerError;
-                Console.WriteLine("LoadUserDataFromApi: Max retry count reached. Operation failed.");
-                RequestRouterHandler.status = response.StatusCode;
-            }
+            // If the operation still fails after all retries, handle it accordingly
+            Console.WriteLine("LoadUserDataFromApi: Max retry count reached. Operation failed.");
+            // You might want to set the status code or take other actions
+        }
+
+        // Example method to check if a SQL exception is transient
+        private static bool IsTransientSqlException(SqlException ex)
+        {
+            // You can customize this method based on the specific SQL exceptions you want to retry
+            return ex.Number == 2 || ex.Number == 53; // Example: Retry for network-related errors
+        }
+
+        // Example method to check if an exception is transient
+        private static bool IsTransientException(Exception ex)
+        {
+            // You can customize this method based on the specific exceptions you want to retry
+            return ex is TimeoutException || ex is IOException; // Example: Retry for timeouts or IO errors
         }
 
     }
