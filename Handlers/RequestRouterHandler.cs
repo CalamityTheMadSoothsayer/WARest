@@ -121,18 +121,35 @@ namespace WorldsAdriftServer.Handlers
                 xmlDoc.Load(xmlFilePath);
 
                 // Extract database connection details
-                string serverName = xmlDoc.SelectSingleNode("/DatabaseConfiguration/ServerName").InnerText;
-                string dbName = xmlDoc.SelectSingleNode("/DatabaseConfiguration/DatabaseName").InnerText;
-                string username = xmlDoc.SelectSingleNode("/DatabaseConfiguration/Username").InnerText;
-                string password = xmlDoc.SelectSingleNode("/DatabaseConfiguration/Password").InnerText;
+                XmlNode serverNode = xmlDoc.SelectSingleNode("/DatabaseConfiguration/ServerName");
+                XmlNode dbNode = xmlDoc.SelectSingleNode("/DatabaseConfiguration/DatabaseName");
+                XmlNode userNode = xmlDoc.SelectSingleNode("/DatabaseConfiguration/Username");
+                XmlNode passwordNode = xmlDoc.SelectSingleNode("/DatabaseConfiguration/Password");
 
-                return true;
+                // Check for null before accessing node values
+                if (serverNode != null && dbNode != null && userNode != null && passwordNode != null)
+                {
+                    string serverName = serverNode.InnerText;
+                    string dbName = dbNode.InnerText;
+                    string username = userNode.InnerText;
+                    string password = passwordNode.InnerText;
+
+                    // Use database connection details as needed
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine("One or more nodes are missing in the XML file.");
+                    return false;
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"Error loading config: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return false;
             }
         }
+
     }
 }
