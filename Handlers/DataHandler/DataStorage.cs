@@ -113,8 +113,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                         Console.WriteLine("Connection opened successfully!");
 
                         // Now try to execute a simple query
-                        string query = "SELECT * FROM \"public\".\"userdata\"";
-                        Console.WriteLine("Executing Query: " + query);
+                        string query = "SELECT * FROM \"userdata\"";
 
                         using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
                         {
