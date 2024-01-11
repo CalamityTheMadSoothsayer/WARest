@@ -13,11 +13,12 @@ namespace WorldsAdriftServer
 
             //server.AddStaticContent() here to add some filesystem path to serve
             restServer.Start();
-
+            Console.WriteLine("Congratulations on setting up Worlds Adrift Reborn.");
             Console.WriteLine("Press Any key to stop");
             Console.ReadKey();
 
             restServer.Stop();
+            Console.WriteLine("use [dotnet WorldsAdriftServer.dll] to restart");
         }
     }
 }
