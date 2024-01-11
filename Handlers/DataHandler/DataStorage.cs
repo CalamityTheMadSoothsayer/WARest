@@ -50,8 +50,8 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                                 // Character already exists, send appropriate response
                                 Console.WriteLine("Character data already exists.");
 
-                                // Build and send response
-                                BuildAndSendErrorResponse(session, "Character data already exists.");
+                                // Set variables here as needed
+                                RequestRouterHandler.status = HttpStatusCode.Conflict;
 
                                 return;
                             }
@@ -72,8 +72,8 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                                     retryCount = 0;
                                     success = true;
 
-                                    // Build and send success response
-                                    BuildAndSendSuccessResponse(session);
+                                    // Set variables here as needed
+                                    RequestRouterHandler.status = HttpStatusCode.OK;
 
                                     break;
                                 }
@@ -82,8 +82,10 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                                     // Include the complete error message in the response
                                     Console.WriteLine($"Error updating session: {updateSessionSql}");
 
-                                    // Build and send error response
-                                    BuildAndSendErrorResponse(session, $"Error updating session: {updateSessionSql}");
+                                    // Set variables here as needed
+                                    RequestRouterHandler.status = HttpStatusCode.InternalServerError;
+
+                                    break;
                                 }
                             }
                         }
@@ -92,8 +94,8 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                             // Session is already set, send appropriate response
                             Console.WriteLine("Session already set.");
 
-                            // Build and send error response
-                            BuildAndSendErrorResponse(session, "Session already set.");
+                            // Set variables here as needed
+                            RequestRouterHandler.status = HttpStatusCode.Conflict;
 
                             return;
                         }
@@ -114,8 +116,8 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     }
                     else
                     {
-                        // Build and send error response
-                        BuildAndSendErrorResponse(session, $"Npgsql Exception: {ex.Message}");
+                        // Set variables here as needed
+                        RequestRouterHandler.status = HttpStatusCode.InternalServerError;
 
                         // Break out of the retry loop for non-transient exceptions
                         break;
@@ -136,8 +138,8 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     }
                     else
                     {
-                        // Build and send error response
-                        BuildAndSendErrorResponse(session,$"Exception: {ex.Message}");
+                        // Set variables here as needed
+                        RequestRouterHandler.status = HttpStatusCode.InternalServerError;
 
                         // Break out of the retry loop for non-transient exceptions
                         break;
@@ -149,10 +151,11 @@ namespace WorldsAdriftServer.Handlers.DataHandler
             {
                 Console.WriteLine("StoreUserData: Max retry count reached. Operation failed.");
 
-                // Build and send error response
-                BuildAndSendErrorResponse(session,"Max retry count reached. Operation failed.");
+                // Set variables here as needed
+                RequestRouterHandler.status = HttpStatusCode.InternalServerError;
             }
         }
+
 
         private static void BuildAndSendSuccessResponse(HttpSession session)
         {
