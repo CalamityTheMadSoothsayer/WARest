@@ -111,9 +111,9 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
                     {
                         connection.Open();
-
+                        Console.WriteLine(connection.ConnectionString);
                         // Your SQL query to retrieve user data
-                        string sqlQuery = "SELECT * FROM userdata;";
+                        string sqlQuery = "select * from userdata";
 
                         using (NpgsqlCommand command = new NpgsqlCommand(sqlQuery, connection))
                         {
