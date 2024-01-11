@@ -140,7 +140,11 @@ namespace WorldsAdriftServer.Handlers
                     username = userNode.InnerText;
                     password = passwordNode.InnerText;
 
-                    // Use database connection details as needed
+                    Console.WriteLine($"Loaded serverName: {RequestRouterHandler.serverName}");
+                    Console.WriteLine($"Loaded dbName: {RequestRouterHandler.dbName}");
+                    Console.WriteLine($"Loaded username: {RequestRouterHandler.username}");
+                    Console.WriteLine($"Loaded password: {RequestRouterHandler.password}");
+
                     return true;
                 }
                 else
