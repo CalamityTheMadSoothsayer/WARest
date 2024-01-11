@@ -108,67 +108,65 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
 
         public static (List<CharacterCreationData>, HttpStatusCode) GetCharacterList( string userKey )
         {
-            lock (DataHandler.DataStorage.apiLock)
+            using (var httpClient = new System.Net.Http.HttpClient())
             {
-                using (var httpClient = new System.Net.Http.HttpClient())
+                var requestData = new
                 {
-                    var requestData = new
-                    {
-                        UserKey = userKey
-                    };
+                    UserKey = userKey
+                };
 
-                    var jsonData = JsonConvert.SerializeObject(requestData);
-                    var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+                var jsonData = JsonConvert.SerializeObject(requestData);
+                var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
-                    HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
 
-                    // Make a POST request to API endpoint to fetch character data
+                // Make a POST request to API endpoint to fetch character data
+                try
+                {
+                    response = httpClient.PostAsync($"/getCharacterList.php", content).Result;
+                }
+                catch (Exception ex)
+                {
+                    // Handle failure
+                    Console.WriteLine($"Error making POST request: {ex.Message}");
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = response.Content.ReadAsStringAsync().Result;
+
                     try
                     {
-                        response = httpClient.PostAsync($"{DataHandler.DataStorage.ApiBaseUrl}/getCharacterList.php", content).Result;
-                    }
-                    catch (Exception ex)
-                    {
-                        // Handle failure
-                        Console.WriteLine($"Error making POST request: {ex.Message}");
-                    }
+                        var responseObject = JsonConvert.DeserializeObject<JObject>(responseContent);
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseContent = response.Content.ReadAsStringAsync().Result;
-
-                        try
+                        if (responseObject != null && responseObject["status"].ToString() == "success")
                         {
-                            var responseObject = JsonConvert.DeserializeObject<JObject>(responseContent);
-
-                            if (responseObject != null && responseObject["status"].ToString() == "success")
-                            {
-                                // Extract and return character list from the response along with the HTTP status code
-                                var characterList = responseObject["characterList"].ToObject<List<CharacterCreationData>>();
-                                return (characterList, response.StatusCode);
-                            }
-                            else
-                            {
-                                Console.WriteLine($"Error fetching character data: {response.StatusCode}");
-                                // Handle error accordingly
-                            }
+                            // Extract and return character list from the response along with the HTTP status code
+                            var characterList = responseObject["characterList"].ToObject<List<CharacterCreationData>>();
+                            return (characterList, response.StatusCode);
                         }
-                        catch (JsonReaderException)
+                        else
                         {
-                            // Handle response as a simple string (assuming it's an error message)
-                            Console.WriteLine($"Error fetching character data: {responseContent}");
+                            Console.WriteLine($"Error fetching character data: {response.StatusCode}");
+                            // Handle error accordingly
                         }
                     }
-                    else
+                    catch (JsonReaderException)
                     {
-                        Console.WriteLine($"Error fetching character data: {response.StatusCode}");
-                        // Handle error accordingly
+                        // Handle response as a simple string (assuming it's an error message)
+                        Console.WriteLine($"Error fetching character data: {responseContent}");
                     }
-
-                    // Return an empty list and the HTTP status code if there was an error or no characters found
-                    return (new List<CharacterCreationData>(), response.StatusCode);
                 }
+                else
+                {
+                    Console.WriteLine($"Error fetching character data: {response.StatusCode}");
+                    // Handle error accordingly
+                }
+
+                // Return an empty list and the HTTP status code if there was an error or no characters found
+                return (new List<CharacterCreationData>(), response.StatusCode);
             }
+            
         }
 
     }

@@ -33,7 +33,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                     httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
                     // Make a POST request to your PHP API endpoint to save the character UID
-                    var response = httpClient.PostAsync($"{DataStorage.ApiBaseUrl}/saveCharacterUid.php", new StringContent(jsonData, Encoding.UTF8, "application/json")).Result;
+                    var response = httpClient.PostAsync($"/saveCharacterUid.php", new StringContent(jsonData, Encoding.UTF8, "application/json")).Result;
 
                     if (response.IsSuccessStatusCode)
                     {
