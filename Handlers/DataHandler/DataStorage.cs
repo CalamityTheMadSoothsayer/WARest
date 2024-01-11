@@ -44,11 +44,9 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                         if (String.IsNullOrEmpty(RequestRouterHandler.sessionId))
                         {
                             // Game Session is not set, update the session token in UserData using a prepared statement
-                            string updateSessionSql = "UPDATE UserData SET sessionToken = @sessionId WHERE userKey = @userKey";
+                            string updateSessionSql = $"UPDATE UserData SET sessionToken = {SessionId} WHERE userKey = {userKey}";
                             using (NpgsqlCommand updateSessionCommand = new NpgsqlCommand(updateSessionSql, connection))
                             {
-                                updateSessionCommand.Parameters.AddWithValue("@sessionId", NpgsqlTypes.NpgsqlDbType.Varchar, SessionId);
-                                updateSessionCommand.Parameters.AddWithValue("@userKey", NpgsqlTypes.NpgsqlDbType.Varchar, userKey);
 
                                 if (updateSessionCommand.ExecuteNonQuery() > 0)
                                 {
@@ -179,6 +177,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                                 else
                                 {
                                     Console.WriteLine("No user data found.");
+                                    retryCount = 0;
                                 }
                             }
                         }
