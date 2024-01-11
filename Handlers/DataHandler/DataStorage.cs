@@ -108,17 +108,17 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                         connection.Open();
                         Console.WriteLine("Connection opened successfully!");
 
-                        // Now try to execute a simple query
-                        string query = "SELECT version();";
+                    // Now try to execute a simple query
+                    string query = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';";
 
-                        using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
+                    using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
                         {
                             using (NpgsqlDataReader reader = command.ExecuteReader())
                             {
                                 while (reader.Read())
                                 {
-                                    
-                                }
+                                Console.WriteLine(reader["table_name"]);
+                            }
                             }
                         }
                     }
