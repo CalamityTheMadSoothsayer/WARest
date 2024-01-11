@@ -109,7 +109,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                         Console.WriteLine("Connected successfully!");
 
                     // Now try to execute a simple query
-                    string query = "SELECT table_name, table_schema FROM information_schema.tables;";
+                    string query = "SELECT schemaname, tablename FROM pg_tables;";
 
                     using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
                     {
@@ -118,7 +118,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                             while (reader.Read())
                             {
                                 Console.WriteLine(reader["table_name"]);
-                                Console.WriteLine(reader["table_schema"]);
+                                Console.WriteLine(reader["schemaname"]);
                             }
                         }
                     }
