@@ -106,14 +106,14 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                 try
                 {
                     // Your database connection string for PostgreSQL
-                    string connectionString = $"Host={RequestRouterHandler.serverName};Database=wardatabase;Username={RequestRouterHandler.username};Password={RequestRouterHandler.password};SearchPath=public;";
+                    string connectionString = $"Host=localhost;Database=wardatabase;Username=waradmin;Password=warpassword;";
 
                     using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
                     {
                         connection.Open();
                         Console.WriteLine(connection.ConnectionString);
                         // Your SQL query to retrieve user data
-                        string sqlQuery = "SELECT * from public.userdata";
+                        string sqlQuery = "SELECT * from userdata";
 
                         Console.WriteLine($"Connection State: {connection.State}");
                         Console.WriteLine($"Database Schema: {connection.Database}");
