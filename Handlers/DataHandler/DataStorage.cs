@@ -105,7 +105,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
             {
                 try
                 {
-                    string connectionString = "Host=localhost;Database=wardatabase;Username=waradmin;Password=warpassword;";
+                    string connectionString = "Host=localhost;Database=wardatabase;Username=waradmin;Password=warpassword;Search Path=public;";
 
                     using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
                     {
