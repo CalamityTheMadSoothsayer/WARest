@@ -106,7 +106,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                 try
                 {
                     // Your database connection string for PostgreSQL
-                    string connectionString = $"Host={RequestRouterHandler.serverName};Port=5432;Database={RequestRouterHandler.dbName};Username={RequestRouterHandler.userName};Password={RequestRouterHandler.password};";
+                    string connectionString = $"Host={RequestRouterHandler.serverName};Port=5432;Database={RequestRouterHandler.dbName};Username={RequestRouterHandler.username};Password={RequestRouterHandler.password};";
 
                     using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
                     {
