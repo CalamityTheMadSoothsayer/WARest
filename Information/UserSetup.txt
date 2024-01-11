@@ -1,0 +1,6 @@
+﻿CREATE DATABASE wardatabase;
+CREATE USER waradmin WITH PASSWORD 'warpassword';
+ALTER ROLE waradmin SET client_encoding TO 'utf8';
+ALTER ROLE waradmin SET default_transaction_isolation TO 'read committed';
+ALTER ROLE waradmin SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE wardatabase TO waradmin;

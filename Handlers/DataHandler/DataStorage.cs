@@ -1,9 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Npgsql;
 
 namespace WorldsAdriftServer.Handlers.DataHandler
 {
@@ -103,19 +105,19 @@ namespace WorldsAdriftServer.Handlers.DataHandler
             {
                 try
                 {
-                    // Your database connection string
-                    string connectionString = $"Data Source={RequestRouterHandler.serverName};Initial Catalog={RequestRouterHandler.dbName};User Id={RequestRouterHandler.userName};Password={RequestRouterHandler.password};Port=3306;";
+                    // Your database connection string for PostgreSQL
+                    string connectionString = $"Host={RequestRouterHandler.serverName};Port=5432;Database={RequestRouterHandler.dbName};Username={RequestRouterHandler.userName};Password={RequestRouterHandler.password};";
 
-                    using (SqlConnection connection = new SqlConnection(connectionString))
+                    using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
                     {
                         connection.Open();
 
                         // Your SQL query to retrieve user data
                         string sqlQuery = "SELECT * FROM UserData";
 
-                        using (SqlCommand command = new SqlCommand(sqlQuery, connection))
+                        using (NpgsqlCommand command = new NpgsqlCommand(sqlQuery, connection))
                         {
-                            using (SqlDataReader reader = command.ExecuteReader())
+                            using (NpgsqlDataReader reader = command.ExecuteReader())
                             {
                                 if (reader.HasRows)
                                 {
@@ -124,7 +126,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                                     while (reader.Read())
                                     {
                                         // Assuming your UserData table has 'username' and 'email' columns
-                                                JObject userData = new JObject
+                                        JObject userData = new JObject
                                         {
                                             { "username", reader["username"].ToString() },
                                             { "email", reader["email"].ToString() }
@@ -165,15 +167,15 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     Console.WriteLine($"Retrying... {retryCount} attempts remaining");
                     System.Threading.Thread.Sleep(1000); // Sleep for 1 second before retrying
                 }
-                catch (SqlException ex)
+                catch (NpgsqlException ex)
                 {
                     // Log the exception for analysis
-                    Console.WriteLine($"SQL Exception: {ex.Message}");
+                    Console.WriteLine($"Npgsql Exception: {ex.Message}");
                     // You might want to log the full stack trace and any other relevant details
                     // LogException(ex);
 
-                    // Retry only for specific SQL exceptions that indicate transient issues
-                    if (IsTransientSqlException(ex))
+                    // Retry only for specific Npgsql exceptions that indicate transient issues
+                    if (IsTransientNpgsqlException(ex))
                     {
                         // Decrement the retry count
                         retryCount--;
@@ -214,18 +216,18 @@ namespace WorldsAdriftServer.Handlers.DataHandler
             // You might want to set the status code or take other actions
         }
 
-        // Example method to check if a SQL exception is transient
-        private static bool IsTransientSqlException(SqlException ex)
-        {
-            // You can customize this method based on the specific SQL exceptions you want to retry
-            return ex.Number == 2 || ex.Number == 53; // Example: Retry for network-related errors
-        }
-
         // Example method to check if an exception is transient
         private static bool IsTransientException(Exception ex)
         {
             // You can customize this method based on the specific exceptions you want to retry
-            return ex is TimeoutException || ex is IOException; // Example: Retry for timeouts or IO errors
+            return ex is TimeoutException || ex is IOException || (ex is NpgsqlException && IsTransientNpgsqlException((NpgsqlException)ex)); // Example: Retry for timeouts, IO errors, or specific Npgsql exceptions
+        }
+
+        // Example method to check if an Npgsql exception is transient
+        private static bool IsTransientNpgsqlException(NpgsqlException ex)
+        {
+            // You can customize this method based on the specific Npgsql exceptions you want to retry
+            return ex.InnerException is SocketException || ex.InnerException is IOException; // Example: Retry for network-related errors
         }
 
     }
