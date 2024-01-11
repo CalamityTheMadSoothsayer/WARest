@@ -17,7 +17,6 @@ namespace WorldsAdriftServer.Handlers.Authentication
                 {
                     // i think this token hats usernames with spaces
 
-
                     SteamAuthResponseToken respToken = new SteamAuthResponseToken("WarToken", RequestRouterHandler.userId, "999", true);
                     respToken.screenName = playerName;
                     respToken.playerId = RequestRouterHandler.userId;

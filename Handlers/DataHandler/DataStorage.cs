@@ -22,18 +22,6 @@ namespace WorldsAdriftServer.Handlers.DataHandler
 
             while (retryCount > 0)
             {
-                var userData = new
-                {
-                    UserKey = userKey,
-                    sessionId = SessionId
-                };
-
-                var jsonData = JsonConvert.SerializeObject(userData);
-                var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-
-                // Default to failed
-                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
-
                 try
                 {
                     using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
@@ -51,7 +39,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                                 Console.WriteLine("Character data already exists.");
 
                                 // Set variables here as needed
-                                RequestRouterHandler.status = HttpStatusCode.Conflict;
+                                RequestRouterHandler.status = HttpStatusCode.OK;
 
                                 return;
                             }
@@ -95,7 +83,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                             Console.WriteLine("Session already set.");
 
                             // Set variables here as needed
-                            RequestRouterHandler.status = HttpStatusCode.Conflict;
+                            RequestRouterHandler.status = HttpStatusCode.OK;
 
                             return;
                         }
@@ -155,50 +143,6 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                 RequestRouterHandler.status = HttpStatusCode.InternalServerError;
             }
         }
-
-
-        private static void BuildAndSendSuccessResponse(HttpSession session)
-        {
-            var successResponse = new
-            {
-                status = "success",
-                message = "Session updated successfully"
-                // Add additional fields as needed
-            };
-
-            var successJson = JsonConvert.SerializeObject(successResponse);
-            var successContent = new StringContent(successJson, Encoding.UTF8, "application/json");
-
-            // Send success response
-            HttpResponse resp = new HttpResponse();
-
-            resp.SetBegin(200);
-            resp.SetBody("{}"); // the game does want to have a valid JObject. Its stored in CharacterSelectionHandler.LastReceivedCharacterList so maybe important to pass valid stuff here in the future
-
-            session.SendResponseAsync(resp);
-        }
-
-        private static void BuildAndSendErrorResponse(HttpSession session, string errorMessage)
-        {
-            var errorResponse = new
-            {
-                status = "error",
-                message = errorMessage
-                // Add additional fields as needed
-            };
-
-            var errorJson = JsonConvert.SerializeObject(errorResponse);
-            var errorContent = new StringContent(errorJson, Encoding.UTF8, "application/json");
-
-            // Send error response
-            HttpResponse resp = new HttpResponse();
-
-            resp.SetBegin(500);
-            resp.SetBody("{}"); // the game does want to have a valid JObject. Its stored in CharacterSelectionHandler.LastReceivedCharacterList so maybe important to pass valid stuff here in the future
-
-            session.SendResponseAsync(resp);
-        }
-
 
         public static void LoadUserDataFromApi()
         {
