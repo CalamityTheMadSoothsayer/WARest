@@ -14,7 +14,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
         public static readonly ConcurrentDictionary<string, JObject> userDataDictionary = new ConcurrentDictionary<string, JObject>();
         public static string connectionString = $"Host={RequestRouterHandler.serverName};Port=5432;Database={RequestRouterHandler.dbName};Username={RequestRouterHandler.username};Password={RequestRouterHandler.password};";
 
-        private static void StoreUserData(string SessionId, string userKey)
+        public void StoreUserData(string SessionId, string userKey)
         {
             int retryCount = 3;
             bool success = false;
@@ -44,10 +44,9 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                         if (String.IsNullOrEmpty(RequestRouterHandler.sessionId))
                         {
                             // Game Session is not set, update the session token in UserData using a prepared statement
-                            string updateSessionSql = $"UPDATE UserData SET sessionToken = {SessionId} WHERE userKey = {userKey}";
+                            string updateSessionSql = $"UPDATE UserData SET sessionToken = '{SessionId}' WHERE userKey = '{userKey}'";
                             using (NpgsqlCommand updateSessionCommand = new NpgsqlCommand(updateSessionSql, connection))
                             {
-
                                 if (updateSessionCommand.ExecuteNonQuery() > 0)
                                 {
                                     // Store userKey in the session
@@ -115,9 +114,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
             {
                 Console.WriteLine("StoreUserData: Max retry count reached. Operation failed.");
             }
-           
         }
-
 
         public static void LoadUserDataFromApi()
         {
