@@ -113,7 +113,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                         Console.WriteLine("Connection opened successfully!");
 
                         // Now try to execute a simple query
-                        string query = "SELECT * FROM \"userdata\"";
+                        string query = "SELECT version();";
 
                         using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
                         {
