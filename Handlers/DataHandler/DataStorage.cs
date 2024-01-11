@@ -113,7 +113,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                         Console.WriteLine("Connection opened successfully!");
 
                         // Now try to execute a simple query
-                        string query = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'";
+                        string query = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';";
 
 
                         using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
