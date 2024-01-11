@@ -110,7 +110,7 @@ namespace WorldsAdriftServer.Handlers
             try
             {
                 // Specify the full path to the XML file
-                string xmlFilePath = "./db.txt";
+                string xmlFilePath = "./db.xml";
 
                 // Load the XML file
                 XmlDocument xmlDoc = new XmlDocument();
