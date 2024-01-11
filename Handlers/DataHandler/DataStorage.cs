@@ -117,7 +117,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                         {
                             while (reader.Read())
                             {
-                                Console.WriteLine(reader["table_name"]);
+                                Console.WriteLine(reader["tablename"]);
                                 Console.WriteLine(reader["schemaname"]);
                             }
                         }
