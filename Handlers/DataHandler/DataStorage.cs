@@ -99,10 +99,6 @@ namespace WorldsAdriftServer.Handlers.DataHandler
 
         public static void LoadUserDataFromApi()
         {
-            int retryCount = 3;
-
-            while (retryCount > 0)
-            {
                 try
                 {
                     string connectionString = "Host=localhost;Database=wardatabase;Username=waradmin;Password=warpassword;Search Path=public;";
@@ -121,7 +117,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                             {
                                 while (reader.Read())
                                 {
-                                    Console.WriteLine($"Username: {reader["username"]}, Email: {reader["email"]}");
+                                    
                                 }
                             }
                         }
@@ -131,11 +127,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                 {
                     Console.WriteLine($"Exception: {ex.Message}");
                 }
-            }
-
-            // If the operation still fails after all retries, handle it accordingly
-            Console.WriteLine("LoadUserDataFromApi: Max retry count reached. Operation failed.");
-            // You might want to set the status code or take other actions
+            
         }
 
         // Example method to check if an exception is transient
