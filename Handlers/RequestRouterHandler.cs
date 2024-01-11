@@ -67,7 +67,7 @@ namespace WorldsAdriftServer.Handlers
                     }
 
                     // create session and begin storing user
-                    DataStorage.StoreUserData(sessionId, userKey);
+                    DataStorage.StoreUserData(this, sessionId, userKey);
 
                     // Call the authentication handler with the extracted data
                     SteamAuthenticationHandler.HandleAuthRequest(this, request, userKey);

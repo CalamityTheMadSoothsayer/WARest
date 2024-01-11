@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using NetCoreServer;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Npgsql;
@@ -14,13 +15,25 @@ namespace WorldsAdriftServer.Handlers.DataHandler
         public static readonly ConcurrentDictionary<string, JObject> userDataDictionary = new ConcurrentDictionary<string, JObject>();
         public static string connectionString = $"Host={RequestRouterHandler.serverName};Port=5432;Database={RequestRouterHandler.dbName};Username={RequestRouterHandler.username};Password={RequestRouterHandler.password};";
 
-        public static void StoreUserData(string SessionId, string userKey)
+        public static void StoreUserData(HttpSession session, string SessionId, string userKey)
         {
             int retryCount = 3;
             bool success = false;
 
             while (retryCount > 0)
             {
+                var userData = new
+                {
+                    UserKey = userKey,
+                    sessionId = SessionId
+                };
+
+                var jsonData = JsonConvert.SerializeObject(userData);
+                var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                // Default to failed
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
+
                 try
                 {
                     using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
@@ -36,6 +49,10 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                             {
                                 // Character already exists, send appropriate response
                                 Console.WriteLine("Character data already exists.");
+
+                                // Build and send response
+                                BuildAndSendErrorResponse(session, "Character data already exists.");
+
                                 return;
                             }
                         }
@@ -54,12 +71,19 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                                     Console.WriteLine("Session updated successfully.");
                                     retryCount = 0;
                                     success = true;
+
+                                    // Build and send success response
+                                    BuildAndSendSuccessResponse(session);
+
                                     break;
                                 }
                                 else
                                 {
                                     // Include the complete error message in the response
                                     Console.WriteLine($"Error updating session: {updateSessionSql}");
+
+                                    // Build and send error response
+                                    BuildAndSendErrorResponse(session, $"Error updating session: {updateSessionSql}");
                                 }
                             }
                         }
@@ -67,6 +91,10 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                         {
                             // Session is already set, send appropriate response
                             Console.WriteLine("Session already set.");
+
+                            // Build and send error response
+                            BuildAndSendErrorResponse(session, "Session already set.");
+
                             return;
                         }
                     }
@@ -86,6 +114,9 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     }
                     else
                     {
+                        // Build and send error response
+                        BuildAndSendErrorResponse(session, $"Npgsql Exception: {ex.Message}");
+
                         // Break out of the retry loop for non-transient exceptions
                         break;
                     }
@@ -105,6 +136,9 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     }
                     else
                     {
+                        // Build and send error response
+                        BuildAndSendErrorResponse(session,$"Exception: {ex.Message}");
+
                         // Break out of the retry loop for non-transient exceptions
                         break;
                     }
@@ -114,8 +148,54 @@ namespace WorldsAdriftServer.Handlers.DataHandler
             if (!success)
             {
                 Console.WriteLine("StoreUserData: Max retry count reached. Operation failed.");
+
+                // Build and send error response
+                BuildAndSendErrorResponse(session,"Max retry count reached. Operation failed.");
             }
         }
+
+        private static void BuildAndSendSuccessResponse(HttpSession session)
+        {
+            var successResponse = new
+            {
+                status = "success",
+                message = "Session updated successfully"
+                // Add additional fields as needed
+            };
+
+            var successJson = JsonConvert.SerializeObject(successResponse);
+            var successContent = new StringContent(successJson, Encoding.UTF8, "application/json");
+
+            // Send success response
+            HttpResponse resp = new HttpResponse();
+
+            resp.SetBegin(200);
+            resp.SetBody("{}"); // the game does want to have a valid JObject. Its stored in CharacterSelectionHandler.LastReceivedCharacterList so maybe important to pass valid stuff here in the future
+
+            session.SendResponseAsync(resp);
+        }
+
+        private static void BuildAndSendErrorResponse(HttpSession session, string errorMessage)
+        {
+            var errorResponse = new
+            {
+                status = "error",
+                message = errorMessage
+                // Add additional fields as needed
+            };
+
+            var errorJson = JsonConvert.SerializeObject(errorResponse);
+            var errorContent = new StringContent(errorJson, Encoding.UTF8, "application/json");
+
+            // Send error response
+            HttpResponse resp = new HttpResponse();
+
+            resp.SetBegin(500);
+            resp.SetBody("{}"); // the game does want to have a valid JObject. Its stored in CharacterSelectionHandler.LastReceivedCharacterList so maybe important to pass valid stuff here in the future
+
+            session.SendResponseAsync(resp);
+        }
+
 
         public static void LoadUserDataFromApi()
         {
