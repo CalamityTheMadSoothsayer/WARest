@@ -113,7 +113,8 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                         connection.Open();
                         Console.WriteLine(connection.ConnectionString);
                         // Your SQL query to retrieve user data
-                        string sqlQuery = "SELECT 1";
+                        string sqlQuery = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE'";
+
 
                         using (NpgsqlCommand command = new NpgsqlCommand(sqlQuery, connection))
                         {
@@ -126,12 +127,8 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                                     while (reader.Read())
                                     {
                                         // Assuming your UserData table has 'username' and 'email' columns
-                                        JObject userData = new JObject
-                                        {
-                                            { "username", reader["username"].ToString() },
-                                            { "email", reader["email"].ToString() }
-                                            // Add more fields as needed
-                                        };
+                                        string tableName = reader["table_name"].ToString();
+                                        Console.WriteLine($"Table Name: {tableName}");
 
                                         userDataArray.Add(userData);
                                     }
