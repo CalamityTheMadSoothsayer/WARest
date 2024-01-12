@@ -108,7 +108,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                 connection.Open();
 
                 // Check if the user exists
-                string checkUserSql = $"SELECT * FROM UserData WHERE userKey = '{userKey}'";
+                string checkUserSql = $"SELECT * FROM userdata WHERE userKey = '{userKey}'";
                 using (NpgsqlCommand checkUserCommand = new NpgsqlCommand(checkUserSql, connection))
                 using (NpgsqlDataReader checkUserReader = checkUserCommand.ExecuteReader())
                 {
