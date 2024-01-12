@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using Microsoft.IdentityModel.Tokens;
 using NetCoreServer;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -135,6 +136,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
             int retryCount = 3;
             bool success = false;
             bool previousUser = false;
+            string dbSession = "-1";
 
             while (retryCount > 0)
             {
@@ -155,43 +157,43 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                                 Console.WriteLine("User data already exists.");
 
                                 previousUser = true;
-
-                                // Check if the session matches
                                 checkUserReader.Read();
-                                if (checkUserReader["sessionToken"].ToString() != SessionId)
-                                {
-                                    // Session doesn't match, update the session token
-                                    string updateSessionSql = $"UPDATE userdata SET sessionToken = '{SessionId}' WHERE userKey = '{userKey}'";
-                                    using (NpgsqlCommand updateSessionCommand = new NpgsqlCommand(updateSessionSql, connection))
-                                    {
-                                        if (updateSessionCommand.ExecuteNonQuery() > 0)
-                                        {
-                                            // Update successful
-                                            Console.WriteLine("Session updated successfully.");
-                                            retryCount = 0;
-                                            success = true;
-                                            RequestRouterHandler.status = HttpStatusCode.OK;
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            // Update failed
-                                            Console.WriteLine($"Error updating session: {updateSessionSql}");
-                                            RequestRouterHandler.status = HttpStatusCode.InternalServerError;
-                                            break;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    // Session matches, send OK response
-                                    Console.WriteLine("Session already matches.");
-                                    RequestRouterHandler.status = HttpStatusCode.OK;
-                                    return;
-                                }
+                                dbSession = checkUserReader["sessionToken"].ToString();
                             }
                         }
 
+                        // Check if the session matches
+                        
+                        if (dbSession != SessionId)
+                        {
+                            // Session doesn't match, update the session token
+                            string updateSessionSql = $"UPDATE userdata SET sessionToken = '{SessionId}' WHERE userKey = '{userKey}'";
+                            using (NpgsqlCommand updateSessionCommand = new NpgsqlCommand(updateSessionSql, connection))
+                            {
+                                if (updateSessionCommand.ExecuteNonQuery() > 0)
+                                {
+                                    // Update successful
+                                    Console.WriteLine("Session updated successfully.");
+                                    retryCount = 0;
+                                    success = true;
+                                    RequestRouterHandler.status = HttpStatusCode.OK;
+                                }
+                                else
+                                {
+                                    // Update failed
+                                    Console.WriteLine($"Error updating session: {updateSessionSql}");
+                                    RequestRouterHandler.status = HttpStatusCode.InternalServerError;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Session matches, send OK response
+                            Console.WriteLine("Session already matches.");
+                            RequestRouterHandler.status = HttpStatusCode.OK;
+                            return;
+                        }
+                          
                         // If the user doesn't exist, insert a new user
                         if (!previousUser)
                         {
