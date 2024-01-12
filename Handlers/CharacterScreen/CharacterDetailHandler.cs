@@ -209,7 +209,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
 
                     string insertCharacterSql = $@"
                         INSERT INTO CharacterDetails (userKey, characterUid, name, server, serverIdentifier, isMale, seenIntro, skippedTutorial,
-                        headId, headPrefab, hairColorR, headColorPrimaryR, headColorPrimaryG, headColorPrimaryB, headColorPrimaryA,
+                        headId, headPrefab, headColorPrimaryR, headColorPrimaryG, headColorPrimaryB, headColorPrimaryA,
                         headColorSecondaryR, headColorSecondaryG, headColorSecondaryB, headColorSecondaryA, 
                         headColorTertiaryR, headColorTertiaryG, headColorTertiaryB, headColorTertiaryA,
                         headColorSpecR, headColorSpecG, headColorSpecB, headColorSpecA,
