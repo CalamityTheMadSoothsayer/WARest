@@ -13,11 +13,12 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
         {
             try
             {
-                // Parse the request body to get the character UID
+                // Parse the request body to get the character UID and screen name
                 JObject requestBody = JObject.Parse(request.Body);
 
                 // Extract data from the request
                 var characterUid = requestBody["characterUid"]?.ToString();
+                var screenName = requestBody["screenName"]?.ToString(); // Assuming the screen name is available in the request
 
                 using (NpgsqlConnection connection = new NpgsqlConnection(DataHandler.DataStorage.connectionString))
                 {
@@ -40,8 +41,8 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                         }
                     }
 
-                    // Insert the character UID into the database
-                    string insertCharacterSql = $"INSERT INTO CharacterDetails (userKey, characteruid) VALUES ('{userKey}', '{characterUid}')";
+                    // Insert the character UID into the database along with the screen name and other necessary columns
+                    string insertCharacterSql = $"INSERT INTO CharacterDetails (userKey, characteruid, name) VALUES ('{userKey}', '{characterUid}', '{screenName}')";
                     using (NpgsqlCommand insertCharacterCommand = new NpgsqlCommand(insertCharacterSql, connection))
                     {
                         insertCharacterCommand.ExecuteNonQuery();
@@ -79,5 +80,5 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                 session.SendResponseAsync(errorHttpResponse);
             }
         }
+
     }
-}
