@@ -9,6 +9,8 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
 {
     internal class CharacterNameHandler
     {
+        // ...
+
         public static void SaveCharacterUid(HttpRequest request, string userKey, HttpSession session)
         {
             try
@@ -42,7 +44,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                     }
 
                     // Insert the character UID into the database along with the screen name and other necessary columns
-                    string insertCharacterSql = $"INSERT INTO CharacterDetails (userKey, characteruid, name) VALUES ('{userKey}', '{characterUid}', '{screenName}')";
+                    string insertCharacterSql = $"INSERT INTO CharacterDetails (userKey, characteruid, name, server) VALUES ('{userKey}', '{characterUid}', '{screenName}', 'default_server')";
                     using (NpgsqlCommand insertCharacterCommand = new NpgsqlCommand(insertCharacterSql, connection))
                     {
                         insertCharacterCommand.ExecuteNonQuery();
