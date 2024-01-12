@@ -130,15 +130,15 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                             CharacterCreationData characterData = new CharacterCreationData
                             (
                                 characterReader.GetInt32(characterReader.GetOrdinal("id")),
-                                characterReader.GetString(characterReader.GetOrdinal("character_uid")),
+                                characterReader.GetString(characterReader.GetOrdinal("characteruid")),
                                 characterReader.GetString(characterReader.GetOrdinal("name")),
                                 characterReader.GetString(characterReader.GetOrdinal("server")),
-                                characterReader.GetString(characterReader.GetOrdinal("server_identifier")),
+                                characterReader.GetString(characterReader.GetOrdinal("serveridentifier")),
                                 new Dictionary<CharacterSlotType, ItemData>(), // Initialize if needed
                                 new CharacterUniversalColors(), // Initialize if needed
-                                characterReader.GetBoolean(characterReader.GetOrdinal("is_male")),
-                                characterReader.GetBoolean(characterReader.GetOrdinal("seen_intro")),
-                                characterReader.GetBoolean(characterReader.GetOrdinal("skipped_tutorial"))
+                                characterReader.GetBoolean(characterReader.GetOrdinal("ismale")),
+                                characterReader.GetBoolean(characterReader.GetOrdinal("seenintro")),
+                                characterReader.GetBoolean(characterReader.GetOrdinal("skippedtutorial"))
                             );
 
                             characterList.Add(characterData);

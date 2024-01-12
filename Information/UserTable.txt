@@ -1,5 +1,5 @@
 ﻿CREATE TABLE UserData (
     userKey VARCHAR(255) PRIMARY KEY UNIQUE NOT NULL,
-    characterUID VARCHAR(255) NOT NULL,
+    characterUID VARCHAR(255),
     sessionToken VARCHAR(255)
 );
