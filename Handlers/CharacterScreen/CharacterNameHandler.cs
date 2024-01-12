@@ -24,7 +24,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                     connection.Open();
 
                     // Check if the character UID already exists for the player in the database
-                    string checkCharacterSql = $"SELECT * FROM CharacterDetails WHERE userKey = '{userKey}' AND character_uid = '{characterUid}'";
+                    string checkCharacterSql = $"SELECT * FROM CharacterDetails WHERE userKey = '{userKey}' AND characteruid = '{characterUid}'";
                     using (NpgsqlCommand checkCharacterCommand = new NpgsqlCommand(checkCharacterSql, connection))
                     using (NpgsqlDataReader checkCharacterReader = checkCharacterCommand.ExecuteReader())
                     {
@@ -41,7 +41,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                     }
 
                     // Insert the character UID into the database
-                    string insertCharacterSql = $"INSERT INTO CharacterDetails (userKey, character_uid) VALUES ('{userKey}', '{characterUid}')";
+                    string insertCharacterSql = $"INSERT INTO CharacterDetails (userKey, characteruid) VALUES ('{userKey}', '{characterUid}')";
                     using (NpgsqlCommand insertCharacterCommand = new NpgsqlCommand(insertCharacterSql, connection))
                     {
                         insertCharacterCommand.ExecuteNonQuery();
