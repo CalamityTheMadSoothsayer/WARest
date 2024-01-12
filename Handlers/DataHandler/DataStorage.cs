@@ -82,15 +82,9 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                             }
                         }
                     }
-
-                    // If no exception occurred, decrement the retry count
-                    retryCount--;
-                    Console.WriteLine($"Retrying... {retryCount} attempts remaining");
-                    System.Threading.Thread.Sleep(1000); // Sleep for 1 second before retrying
                 }
                 catch (NpgsqlException ex)
                 {
-                    // Log the exception for analysis
                     Console.WriteLine($"Npgsql Exception: {ex.Message}");
 
                     // Retry only for specific Npgsql exceptions that indicate transient issues

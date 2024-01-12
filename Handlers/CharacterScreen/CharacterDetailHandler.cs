@@ -4,6 +4,8 @@ using Newtonsoft.Json.Linq;
 using WorldsAdriftServer.Helper.CharacterSelection;
 using System.Drawing;
 using System.Reflection;
+using WorldsAdriftServer.Objects.CharacterSelection;
+using WorldsAdriftServer.Objects.UnityObjects;
 
 namespace WorldsAdriftServer.Handlers.CharacterScreen
 {
@@ -14,193 +16,19 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
             JObject requestBody = JObject.Parse(request.Body);
             try
             {
-                var characterUid = requestBody["characterUid"]?.ToString();
-                var name = requestBody["Name"]?.ToString();
-                var server = requestBody["Server"]?.ToString();
-                var serverIdentifier = requestBody["serverIdentifier"]?.ToString();
-                var isMale = requestBody["isMale"]?.ToObject<bool>() ?? false;
-                var seenIntro = requestBody["seenIntro"]?.ToObject<bool>() ?? false;
-                var skippedTutorial = requestBody["skippedTutorial"]?.ToObject<bool>() ?? false;
-
-                // Extract Cosmetics properties
-                var headId = requestBody["Cosmetics"]?["Head"]?["Id"]?.ToString();
-                var headPrefab = requestBody["Cosmetics"]?["Head"]?["Prefab"]?.ToString();
-
-                // Extract ColorProps for head
-                var headColorProps = requestBody["Cosmetics"]?["Head"]?["ColorProps"];
-                var headColorPrimary = headColorProps?["PrimaryColor"];
-                var headColorSecondary = headColorProps?["SecondaryColor"];
-                var headColorTertiary = headColorProps?["TertiaryColor"];
-                var headColorSpec = headColorProps?["SpecColor"];
-
-                var headColorPrimaryR = headColorPrimary?["r"]?.ToObject<float>() ?? 0.0;
-                var headColorPrimaryG = headColorPrimary?["g"]?.ToObject<float>() ?? 0.0;
-                var headColorPrimaryB = headColorPrimary?["b"]?.ToObject<float>() ?? 0.0;
-                var headColorPrimaryA = headColorPrimary?["a"]?.ToObject<float>() ?? 0.0;
-
-                var headColorSecondaryR = headColorSecondary?["r"]?.ToObject<float>() ?? 0.0;
-                var headColorSecondaryG = headColorSecondary?["g"]?.ToObject<float>() ?? 0.0;
-                var headColorSecondaryB = headColorSecondary?["b"]?.ToObject<float>() ?? 0.0;
-                var headColorSecondaryA = headColorSecondary?["a"]?.ToObject<float>() ?? 0.0;
-
-                var headColorTertiaryR = headColorTertiary?["r"]?.ToObject<float>() ?? 0.0;
-                var headColorTertiaryG = headColorTertiary?["g"]?.ToObject<float>() ?? 0.0;
-                var headColorTertiaryB = headColorTertiary?["b"]?.ToObject<float>() ?? 0.0;
-                var headColorTertiaryA = headColorTertiary?["a"]?.ToObject<float>() ?? 0.0;
-
-                var headColorSpecR = headColorSpec?["r"]?.ToObject<float>() ?? 0.0;
-                var headColorSpecG = headColorSpec?["g"]?.ToObject<float>() ?? 0.0;
-                var headColorSpecB = headColorSpec?["b"]?.ToObject<float>() ?? 0.0;
-                var headColorSpecA = headColorSpec?["a"]?.ToObject<float>() ?? 0.0;
-
-                var headHealth = requestBody["Cosmetics"]?["Head"]?["Health"]?.ToObject<float>() ?? 0.0;
-
-                var bodyId = requestBody["Cosmetics"]?["Body"]?["Id"]?.ToString();
-                var bodyPrefab = requestBody["Cosmetics"]?["Body"]?["Prefab"]?.ToString();
-
-                // Extract ColorProps for body
-                var bodyColorProps = requestBody["Cosmetics"]?["Body"]?["ColorProps"];
-                var bodyColorPrimary = bodyColorProps?["PrimaryColor"];
-                var bodyColorSecondary = bodyColorProps?["SecondaryColor"];
-                var bodyColorTertiary = bodyColorProps?["TertiaryColor"];
-                var bodyColorSpec = bodyColorProps?["SpecColor"];
-
-                var bodyColorPrimaryR = bodyColorPrimary?["r"]?.ToObject<float>() ?? 0.0;
-                var bodyColorPrimaryG = bodyColorPrimary?["g"]?.ToObject<float>() ?? 0.0;
-                var bodyColorPrimaryB = bodyColorPrimary?["b"]?.ToObject<float>() ?? 0.0;
-                var bodyColorPrimaryA = bodyColorPrimary?["a"]?.ToObject<float>() ?? 0.0;
-
-                var bodyColorSecondaryR = bodyColorSecondary?["r"]?.ToObject<float>() ?? 0.0;
-                var bodyColorSecondaryG = bodyColorSecondary?["g"]?.ToObject<float>() ?? 0.0;
-                var bodyColorSecondaryB = bodyColorSecondary?["b"]?.ToObject<float>() ?? 0.0;
-                var bodyColorSecondaryA = bodyColorSecondary?["a"]?.ToObject<float>() ?? 0.0;
-
-                var bodyColorTertiaryR = bodyColorTertiary?["r"]?.ToObject<float>() ?? 0.0;
-                var bodyColorTertiaryG = bodyColorTertiary?["g"]?.ToObject<float>() ?? 0.0;
-                var bodyColorTertiaryB = bodyColorTertiary?["b"]?.ToObject<float>() ?? 0.0;
-                var bodyColorTertiaryA = bodyColorTertiary?["a"]?.ToObject<float>() ?? 0.0;
-
-                var bodyColorSpecR = bodyColorSpec?["r"]?.ToObject<float>() ?? 0.0;
-                var bodyColorSpecG = bodyColorSpec?["g"]?.ToObject<float>() ?? 0.0;
-                var bodyColorSpecB = bodyColorSpec?["b"]?.ToObject<float>() ?? 0.0;
-                var bodyColorSpecA = bodyColorSpec?["a"]?.ToObject<float>() ?? 0.0;
-
-                var bodyHealth = requestBody["Cosmetics"]?["Body"]?["Health"]?.ToObject<float>() ?? 0.0;
-
-                var feetId = requestBody["Cosmetics"]?["Feet"]?["Id"]?.ToString();
-                var feetPrefab = requestBody["Cosmetics"]?["Feet"]?["Prefab"]?.ToString();
-
-                // Extract ColorProps for feet
-                var feetColorProps = requestBody["Cosmetics"]?["Feet"]?["ColorProps"];
-                var feetColorPrimary = feetColorProps?["PrimaryColor"];
-                var feetColorSecondary = feetColorProps?["SecondaryColor"];
-                var feetColorTertiary = feetColorProps?["TertiaryColor"];
-                var feetColorSpec = feetColorProps?["SpecColor"];
-
-                var feetColorPrimaryR = feetColorPrimary?["r"]?.ToObject<float>() ?? 0.0;
-                var feetColorPrimaryG = feetColorPrimary?["g"]?.ToObject<float>() ?? 0.0;
-                var feetColorPrimaryB = feetColorPrimary?["b"]?.ToObject<float>() ?? 0.0;
-                var feetColorPrimaryA = feetColorPrimary?["a"]?.ToObject<float>() ?? 0.0;
-
-                var feetColorSecondaryR = feetColorSecondary?["r"]?.ToObject<float>() ?? 0.0;
-                var feetColorSecondaryG = feetColorSecondary?["g"]?.ToObject<float>() ?? 0.0;
-                var feetColorSecondaryB = feetColorSecondary?["b"]?.ToObject<float>() ?? 0.0;
-                var feetColorSecondaryA = feetColorSecondary?["a"]?.ToObject<float>() ?? 0.0;
-
-                var feetColorTertiaryR = feetColorTertiary?["r"]?.ToObject<float>() ?? 0.0;
-                var feetColorTertiaryG = feetColorTertiary?["g"]?.ToObject<float>() ?? 0.0;
-                var feetColorTertiaryB = feetColorTertiary?["b"]?.ToObject<float>() ?? 0.0;
-                var feetColorTertiaryA = feetColorTertiary?["a"]?.ToObject<float>() ?? 0.0;
-
-                var feetColorSpecR = feetColorSpec?["r"]?.ToObject<float>() ?? 0.0;
-                var feetColorSpecG = feetColorSpec?["g"]?.ToObject<float>() ?? 0.0;
-                var feetColorSpecB = feetColorSpec?["b"]?.ToObject<float>() ?? 0.0;
-                var feetColorSpecA = feetColorSpec?["a"]?.ToObject<float>() ?? 0.0;
-
-                var feetHealth = requestBody["Cosmetics"]?["Feet"]?["Health"]?.ToObject<float>() ?? 0.0;
-
-                var faceId = requestBody["Cosmetics"]?["Face"]?["Id"]?.ToString();
-                var facePrefab = requestBody["Cosmetics"]?["Face"]?["Prefab"]?.ToString();
-
-                // Extract ColorProps for face
-                var faceColorProps = requestBody["Cosmetics"]?["Face"]?["ColorProps"];
-                var faceColorPrimary = faceColorProps?["PrimaryColor"];
-                var faceColorSecondary = faceColorProps?["SecondaryColor"];
-                var faceColorTertiary = faceColorProps?["TertiaryColor"];
-                var faceColorSpec = faceColorProps?["SpecColor"];
-
-                var faceColorPrimaryR = faceColorPrimary?["r"]?.ToObject<float>() ?? 0.0;
-                var faceColorPrimaryG = faceColorPrimary?["g"]?.ToObject<float>() ?? 0.0;
-                var faceColorPrimaryB = faceColorPrimary?["b"]?.ToObject<float>() ?? 0.0;
-                var faceColorPrimaryA = faceColorPrimary?["a"]?.ToObject<float>() ?? 0.0;
-
-                var faceColorSecondaryR = faceColorSecondary?["r"]?.ToObject<float>() ?? 0.0;
-                var faceColorSecondaryG = faceColorSecondary?["g"]?.ToObject<float>() ?? 0.0;
-                var faceColorSecondaryB = faceColorSecondary?["b"]?.ToObject<float>() ?? 0.0;
-                var faceColorSecondaryA = faceColorSecondary?["a"]?.ToObject<float>() ?? 0.0;
-
-                var faceColorTertiaryR = faceColorTertiary?["r"]?.ToObject<float>() ?? 0.0;
-                var faceColorTertiaryG = faceColorTertiary?["g"]?.ToObject<float>() ?? 0.0;
-                var faceColorTertiaryB = faceColorTertiary?["b"]?.ToObject<float>() ?? 0.0;
-                var faceColorTertiaryA = faceColorTertiary?["a"]?.ToObject<float>() ?? 0.0;
-
-                var faceColorSpecR = faceColorSpec?["r"]?.ToObject<float>() ?? 0.0;
-                var faceColorSpecG = faceColorSpec?["g"]?.ToObject<float>() ?? 0.0;
-                var faceColorSpecB = faceColorSpec?["b"]?.ToObject<float>() ?? 0.0;
-                var faceColorSpecA = faceColorSpec?["a"]?.ToObject<float>() ?? 0.0;
-
-                var faceHealth = requestBody["Cosmetics"]?["Face"]?["Health"]?.ToObject<float>() ?? 0.0;
-
-                var facialHairId = requestBody["Cosmetics"]?["FacialHair"]?["Id"]?.ToString();
-                var facialHairPrefab = requestBody["Cosmetics"]?["FacialHair"]?["Prefab"]?.ToString();
-
-                // Extract ColorProps for facial hair
-                var facialHairColorProps = requestBody["Cosmetics"]?["FacialHair"]?["ColorProps"];
-                var facialHairColorPrimary = facialHairColorProps?["PrimaryColor"];
-                var facialHairColorSecondary = facialHairColorProps?["SecondaryColor"];
-                var facialHairColorTertiary = facialHairColorProps?["TertiaryColor"];
-                var facialHairColorSpec = facialHairColorProps?["SpecColor"];
-
-                var facialHairColorPrimaryR = facialHairColorPrimary?["r"]?.ToObject<float>() ?? 0.0;
-                var facialHairColorPrimaryG = facialHairColorPrimary?["g"]?.ToObject<float>() ?? 0.0;
-                var facialHairColorPrimaryB = facialHairColorPrimary?["b"]?.ToObject<float>() ?? 0.0;
-                var facialHairColorPrimaryA = facialHairColorPrimary?["a"]?.ToObject<float>() ?? 0.0;
-
-                var facialHairColorSecondaryR = facialHairColorSecondary?["r"]?.ToObject<float>() ?? 0.0;
-                var facialHairColorSecondaryG = facialHairColorSecondary?["g"]?.ToObject<float>() ?? 0.0;
-                var facialHairColorSecondaryB = facialHairColorSecondary?["b"]?.ToObject<float>() ?? 0.0;
-                var facialHairColorSecondaryA = facialHairColorSecondary?["a"]?.ToObject<float>() ?? 0.0;
-
-                var facialHairColorTertiaryR = facialHairColorTertiary?["r"]?.ToObject<float>() ?? 0.0;
-                var facialHairColorTertiaryG = facialHairColorTertiary?["g"]?.ToObject<float>() ?? 0.0;
-                var facialHairColorTertiaryB = facialHairColorTertiary?["b"]?.ToObject<float>() ?? 0.0;
-                var facialHairColorTertiaryA = facialHairColorTertiary?["a"]?.ToObject<float>() ?? 0.0;
-
-                var facialHairColorSpecR = facialHairColorSpec?["r"]?.ToObject<float>() ?? 0.0;
-                var facialHairColorSpecG = facialHairColorSpec?["g"]?.ToObject<float>() ?? 0.0;
-                var facialHairColorSpecB = facialHairColorSpec?["b"]?.ToObject<float>() ?? 0.0;
-                var facialHairColorSpecA = facialHairColorSpec?["a"]?.ToObject<float>() ?? 0.0;
-
-                var facialHairHealth = requestBody["Cosmetics"]?["FacialHair"]?["Health"]?.ToObject<float>() ?? 0.0;
-
-                // Extract UniversalColors properties
-                var hairColor = requestBody["UniversalColors"]?["HairColor"];
-                var hairColorR = hairColor?["r"]?.ToObject<float>() ?? 0.0;
-                var hairColorG = hairColor?["g"]?.ToObject<float>() ?? 0.0;
-                var hairColorB = hairColor?["b"]?.ToObject<float>() ?? 0.0;
-                var hairColorA = hairColor?["a"]?.ToObject<float>() ?? 1.0;
-
-                var skinColor = requestBody["UniversalColors"]?["SkinColor"];
-                var skinColorR = skinColor?["r"]?.ToObject<float>() ?? 0.0;
-                var skinColorG = skinColor?["g"]?.ToObject<float>() ?? 0.0;
-                var skinColorB = skinColor?["b"]?.ToObject<float>() ?? 0.0;
-                var skinColorA = skinColor?["a"]?.ToObject<float>() ?? 1.0;
-
-                var lipColor = requestBody["UniversalColors"]?["LipColor"];
-                var lipColorR = lipColor?["r"]?.ToObject<float>() ?? 0.0;
-                var lipColorG = lipColor?["g"]?.ToObject<float>() ?? 0.0;
-                var lipColorB = lipColor?["b"]?.ToObject<float>() ?? 0.0;
-                var lipColorA = lipColor?["a"]?.ToObject<float>() ?? 1.0;
+                CharacterCreationData character = new CharacterCreationData
+                (
+                    requestBody["Id"]?.ToObject<int>() ?? 0,
+                    requestBody["characterUid"]?.ToString(),
+                    requestBody["Name"]?.ToString(),
+                    requestBody["Server"]?.ToString(),
+                    requestBody["serverIdentifier"]?.ToString(),
+                    ExtractCosmetics(requestBody),
+                    ExtractUniversalColors(requestBody),
+                    requestBody["isMale"]?.ToObject<bool>() ?? false,
+                    requestBody["seenIntro"]?.ToObject<bool>() ?? false,
+                    requestBody["skippedTutorial"]?.ToObject<bool>() ?? false
+                );
 
 
                 using (NpgsqlConnection connection = new NpgsqlConnection(DataHandler.DataStorage.connectionString))
@@ -208,63 +36,42 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                     connection.Open();
 
                     string insertCharacterSql = $@"
-                        INSERT INTO CharacterDetails (userKey, characterUid, name, server, serverIdentifier, isMale, seenIntro, skippedTutorial,
-                        headId, headPrefab, headColorPrimaryR, headColorPrimaryG, headColorPrimaryB, headColorPrimaryA,
-                        headColorSecondaryR, headColorSecondaryG, headColorSecondaryB, headColorSecondaryA, 
-                        headColorTertiaryR, headColorTertiaryG, headColorTertiaryB, headColorTertiaryA,
-                        headColorSpecR, headColorSpecG, headColorSpecB, headColorSpecA,
-                        headHealth, bodyId, bodyPrefab, bodyColorPrimaryR, bodyColorPrimaryG, bodyColorPrimaryB, bodyColorPrimaryA,
-                        bodyColorSecondaryR, bodyColorSecondaryG, bodyColorSecondaryB, bodyColorSecondaryA, 
-                        bodyColorTertiaryR, bodyColorTertiaryG, bodyColorTertiaryB, bodyColorTertiaryA,
-                        bodyColorSpecR, bodyColorSpecG, bodyColorSpecB, bodyColorSpecA,
-                        bodyHealth, feetId, feetPrefab, feetColorPrimaryR, feetColorPrimaryG, feetColorPrimaryB, feetColorPrimaryA,
-                        feetColorSecondaryR, feetColorSecondaryG, feetColorSecondaryB, feetColorSecondaryA, 
-                        feetColorTertiaryR, feetColorTertiaryG, feetColorTertiaryB, feetColorTertiaryA,
-                        feetColorSpecR, feetColorSpecG, feetColorSpecB, feetColorSpecA,
-                        feetHealth, faceId, facePrefab, faceColorPrimaryR, faceColorPrimaryG, faceColorPrimaryB, faceColorPrimaryA,
-                        faceColorSecondaryR, faceColorSecondaryG, faceColorSecondaryB, faceColorSecondaryA, 
-                        faceColorTertiaryR, faceColorTertiaryG, faceColorTertiaryB, faceColorTertiaryA,
-                        faceColorSpecR, faceColorSpecG, faceColorSpecB, faceColorSpecA,
-                        faceHealth, facialHairId, facialHairPrefab, facialHairColorPrimaryR, facialHairColorPrimaryG, facialHairColorPrimaryB, facialHairColorPrimaryA,
-                        facialHairColorSecondaryR, facialHairColorSecondaryG, facialHairColorSecondaryB, facialHairColorSecondaryA, 
-                        facialHairColorTertiaryR, facialHairColorTertiaryG, facialHairColorTertiaryB, facialHairColorTertiaryA,
-                        facialHairColorSpecR, facialHairColorSpecG, facialHairColorSpecB, facialHairColorSpecA,
-                        facialHairHealth, hairColorR, hairColorG, hairColorB, hairColorA, skinColorR, skinColorG, skinColorB, skinColorA, lipColorR, lipColorG, lipColorB, lipColorA)
-                        VALUES ('{userKey}', '{characterUid}', '{name}', '{server}', '{serverIdentifier}', '{isMale}', '{seenIntro}', '{skippedTutorial}',
-                        '{headId}', '{headPrefab}', 
-                        '{headColorPrimaryR}', '{headColorPrimaryG}', '{headColorPrimaryB}', '{headColorPrimaryA}',
-                        '{headColorSecondaryR}', '{headColorSecondaryG}', '{headColorSecondaryB}', '{headColorSecondaryA}', 
-                        '{headColorTertiaryR}', '{headColorTertiaryG}', '{headColorTertiaryB}', '{headColorTertiaryA}',
-                        '{headColorSpecR}', '{headColorSpecG}', '{headColorSpecB}', '{headColorSpecA}',
-                        '{headHealth}', '{bodyId}', '{bodyPrefab}', '{bodyColorPrimaryR}', '{bodyColorPrimaryG}', '{bodyColorPrimaryB}', '{bodyColorPrimaryA}',
-                        '{bodyColorSecondaryR}', '{bodyColorSecondaryG}', '{bodyColorSecondaryB}', '{bodyColorSecondaryA}', 
-                        '{bodyColorTertiaryR}', '{bodyColorTertiaryG}', '{bodyColorTertiaryB}', '{bodyColorTertiaryA}',
-                        '{bodyColorSpecR}', '{bodyColorSpecG}', '{bodyColorSpecB}', '{bodyColorSpecA}',
-                        '{bodyHealth}', '{feetId}', '{feetPrefab}', '{feetColorPrimaryR}', '{feetColorPrimaryG}', '{feetColorPrimaryB}', '{feetColorPrimaryA}',
-                        '{feetColorSecondaryR}', '{feetColorSecondaryG}', '{feetColorSecondaryB}', '{feetColorSecondaryA}', 
-                        '{feetColorTertiaryR}', '{feetColorTertiaryG}', '{feetColorTertiaryB}', '{feetColorTertiaryA}',
-                        '{feetColorSpecR}', '{feetColorSpecG}', '{feetColorSpecB}', '{feetColorSpecA}',
-                        '{feetHealth}', '{faceId}', '{facePrefab}', '{faceColorPrimaryR}', '{faceColorPrimaryG}', '{faceColorPrimaryB}', '{faceColorPrimaryA}',
-                        '{faceColorSecondaryR}', '{faceColorSecondaryG}', '{faceColorSecondaryB}', '{faceColorSecondaryA}', 
-                        '{faceColorTertiaryR}', '{faceColorTertiaryG}', '{faceColorTertiaryB}', '{faceColorTertiaryA}',
-                        '{faceColorSpecR}', '{faceColorSpecG}', '{faceColorSpecB}', '{faceColorSpecA}',
-                        '{faceHealth}', '{facialHairId}', '{facialHairPrefab}', '{facialHairColorPrimaryR}', '{facialHairColorPrimaryG}', '{facialHairColorPrimaryB}', '{facialHairColorPrimaryA}',
-                        '{facialHairColorSecondaryR}', '{facialHairColorSecondaryG}', '{facialHairColorSecondaryB}', '{facialHairColorSecondaryA}', 
-                        '{facialHairColorTertiaryR}', '{facialHairColorTertiaryG}', '{facialHairColorTertiaryB}', '{facialHairColorTertiaryA}',
-                        '{facialHairColorSpecR}', '{facialHairColorSpecG}', '{facialHairColorSpecB}', '{facialHairColorSpecA}',
-                        '{facialHairHealth}', '{hairColorR}', '{hairColorG}', '{hairColorB}', '{hairColorA}', '{skinColorR}', '{skinColorG}', '{skinColorB}', '{skinColorA}', '{lipColorR}', '{lipColorG}', '{lipColorB}', '{lipColorA}')
+                        INSERT INTO characterdetails
+                        (id, characterUid, name, server, serverIdentifier, isMale, seenIntro, skippedTutorial, 
+                        universalColorsHairColorR, universalColorsHairColorG, universalColorsHairColorB, universalColorsHairColorA,
+                        universalColorsSkinColorR, universalColorsSkinColorG, universalColorsSkinColorB, universalColorsSkinColorA,
+                        universalColorsLipColorR, universalColorsLipColorG, universalColorsLipColorB, universalColorsLipColorA)
+                        VALUES
+                        ({character.Id}, '{character.characterUid}', '{character.Name}', '{character.Server}', '{character.serverIdentifier}', {character.isMale}, {character.seenIntro}, {character.skippedTutorial},
+                        {character.UniversalColors.HairColor.r}, {character.UniversalColors.HairColor.g}, {character.UniversalColors.HairColor.b}, {character.UniversalColors.HairColor.a},
+                        {character.UniversalColors.SkinColor.r}, {character.UniversalColors.SkinColor.g}, {character.UniversalColors.SkinColor.b}, {character.UniversalColors.SkinColor.a},
+                        {character.UniversalColors.LipColor.r}, {character.UniversalColors.LipColor.g}, {character.UniversalColors.LipColor.b}, {character.UniversalColors.LipColor.a})
                     ";
 
                     using (NpgsqlCommand insertCharacterCommand = new NpgsqlCommand(insertCharacterSql, connection))
                     {
                         insertCharacterCommand.ExecuteNonQuery();
                     }
+
                 }
 
-                // Set response status to success (200)
-                HttpResponse httpResponse = new HttpResponse();
-                httpResponse.SetBegin(200);
-                session.SendResponseAsync(httpResponse);
+                RequestRouterHandler.characterList[RequestRouterHandler.characterList.Count] = character;
+                RequestRouterHandler.characterList.Add(Character.GenerateNewCharacter(RequestRouterHandler.serverName, "Blank"));
+
+                CharacterListResponse response = new CharacterListResponse(RequestRouterHandler.characterList);
+
+                response.characterList = RequestRouterHandler.characterList;
+                response.unlockedSlots = RequestRouterHandler.characterList.Count;
+
+                // Use ResponseBuilder to construct and send the response
+                Utilities.ResponseBuilder.BuildAndSendResponse(
+                    session,
+                    (int)RequestRouterHandler.status,
+                    "characterList", response.characterList,
+                    "unlockedSlots", response.unlockedSlots,
+                    "hasMainCharacter", true,
+                    "havenFinished", true
+                );
             }
             catch (Exception ex)
             {
@@ -275,6 +82,76 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                 errorHttpResponse.SetBegin(500);
                 session.SendResponseAsync(errorHttpResponse);
             }
+        }
+
+        private static CharacterUniversalColors ExtractUniversalColors(JObject requestBody)
+        {
+            return new CharacterUniversalColors
+            {
+                HairColor = ExtractColor(requestBody["UniversalColors"]?["HairColor"]),
+                SkinColor = ExtractColor(requestBody["UniversalColors"]?["SkinColor"]),
+                LipColor = ExtractColor(requestBody["UniversalColors"]?["LipColor"])
+            };
+        }
+
+        private static UnityColor ExtractColor(JToken colorJson)
+        {
+            return new UnityColor
+            {
+                r = colorJson?["r"]?.ToObject<float>() ?? 0.0f,
+                g = colorJson?["g"]?.ToObject<float>() ?? 0.0f,
+                b = colorJson?["b"]?.ToObject<float>() ?? 0.0f,
+                a = colorJson?["a"]?.ToObject<float>() ?? 0.0f
+            };
+        }
+
+        private static Dictionary<CharacterSlotType, ItemData> ExtractCosmetics(JObject requestBody)
+        {
+            Dictionary<CharacterSlotType, ItemData> cosmetics = new Dictionary<CharacterSlotType, ItemData>();
+
+            foreach (CharacterSlotType slotType in Enum.GetValues(typeof(CharacterSlotType)))
+            {
+                if (slotType != CharacterSlotType.None)
+                {
+                    string slotName = slotType.ToString();
+                    var itemData = ExtractItemData(requestBody, slotName);
+                    if (itemData != null)
+                    {
+                        cosmetics[slotType] = itemData;
+                    }
+                }
+            }
+
+            return cosmetics;
+        }
+
+        private static ItemData ExtractItemData(JObject requestBody, string slotName)
+        {
+            var itemDataJson = requestBody["Cosmetics"]?[slotName];
+
+            if (itemDataJson != null)
+            {
+                return new ItemData
+                (
+                    itemDataJson["Id"]?.ToString(),
+                    itemDataJson["Prefab"]?.ToString(),
+                    ExtractColorProperties(itemDataJson["ColorProps"]),
+                    itemDataJson["Health"]?.ToObject<float>() ?? 0.0f
+                );
+            }
+
+            return null;
+        }
+
+        private static ColorProperties ExtractColorProperties(JToken colorPropsJson)
+        {
+            return new ColorProperties
+            {
+                PrimaryColor = ExtractColor(colorPropsJson?["PrimaryColor"]),
+                SecondaryColor = ExtractColor(colorPropsJson?["SecondaryColor"]),
+                TertiaryColor = ExtractColor(colorPropsJson?["TertiaryColor"]),
+                SpecColor = ExtractColor(colorPropsJson?["SpecColor"])
+            };
         }
     }
 }
