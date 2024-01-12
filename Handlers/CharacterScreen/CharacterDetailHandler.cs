@@ -229,11 +229,9 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                         facialHairColorSecondaryR, facialHairColorSecondaryG, facialHairColorSecondaryB, facialHairColorSecondaryA, 
                         facialHairColorTertiaryR, facialHairColorTertiaryG, facialHairColorTertiaryB, facialHairColorTertiaryA,
                         facialHairColorSpecR, facialHairColorSpecG, facialHairColorSpecB, facialHairColorSpecA,
-                        facialHairHealth, hairColorR AS UniversalHairColorR, hairColorG AS UniversalHairColorG, hairColorB AS UniversalHairColorB, hairColorA AS UniversalHairColorA,
-                        skinColorR AS UniversalSkinColorR, skinColorG AS UniversalSkinColorG, skinColorB AS UniversalSkinColorB, skinColorA AS UniversalSkinColorA,
-                        lipColorR AS UniversalLipColorR, lipColorG AS UniversalLipColorG, lipColorB AS UniversalLipColorB, lipColorA AS UniversalLipColorA)
+                        facialHairHealth, hairColorR, hairColorG, hairColorB, hairColorA, skinColorR, skinColorG, skinColorB, skinColorA, lipColorR, lipColorG, lipColorB, lipColorA)
                         VALUES ('{userKey}', '{characterUid}', '{name}', '{server}', '{serverIdentifier}', '{isMale}', '{seenIntro}', '{skippedTutorial}',
-                        '{headId}', '{headPrefab}', '{hairColorR}', 
+                        '{headId}', '{headPrefab}', 
                         '{headColorPrimaryR}', '{headColorPrimaryG}', '{headColorPrimaryB}', '{headColorPrimaryA}',
                         '{headColorSecondaryR}', '{headColorSecondaryG}', '{headColorSecondaryB}', '{headColorSecondaryA}', 
                         '{headColorTertiaryR}', '{headColorTertiaryG}', '{headColorTertiaryB}', '{headColorTertiaryA}',
@@ -256,7 +254,6 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                         '{facialHairColorSpecR}', '{facialHairColorSpecG}', '{facialHairColorSpecB}', '{facialHairColorSpecA}',
                         '{facialHairHealth}', '{hairColorR}', '{hairColorG}', '{hairColorB}', '{hairColorA}', '{skinColorR}', '{skinColorG}', '{skinColorB}', '{skinColorA}', '{lipColorR}', '{lipColorG}', '{lipColorB}', '{lipColorA}')
                     ";
-
 
                     using (NpgsqlCommand insertCharacterCommand = new NpgsqlCommand(insertCharacterSql, connection))
                     {
