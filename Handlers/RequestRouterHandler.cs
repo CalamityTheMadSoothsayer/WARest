@@ -90,7 +90,7 @@ namespace WorldsAdriftServer.Handlers
                 }
                 else if (request.Method == "POST" && request.Url.Contains("character/0.3.32.0.1880/steam/1234"))
                 {
-                    CharacterDetailHandler.SaveDetails(this);
+                    CharacterDetailHandler.SaveDetails(this, userId, request);
                 }
                 else if(request.Method == "GET" && request.Url == "/deploymentStatus")
                 {
