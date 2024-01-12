@@ -229,7 +229,9 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                         facialHairColorSecondaryR, facialHairColorSecondaryG, facialHairColorSecondaryB, facialHairColorSecondaryA, 
                         facialHairColorTertiaryR, facialHairColorTertiaryG, facialHairColorTertiaryB, facialHairColorTertiaryA,
                         facialHairColorSpecR, facialHairColorSpecG, facialHairColorSpecB, facialHairColorSpecA,
-                        facialHairHealth, hairColorR, hairColorG, hairColorB, hairColorA, skinColorR, skinColorG, skinColorB, skinColorA, lipColorR, lipColorG, lipColorB, lipColorA)
+                        facialHairHealth, hairColorR AS UniversalHairColorR, hairColorG AS UniversalHairColorG, hairColorB AS UniversalHairColorB, hairColorA AS UniversalHairColorA,
+                        skinColorR AS UniversalSkinColorR, skinColorG AS UniversalSkinColorG, skinColorB AS UniversalSkinColorB, skinColorA AS UniversalSkinColorA,
+                        lipColorR AS UniversalLipColorR, lipColorG AS UniversalLipColorG, lipColorB AS UniversalLipColorB, lipColorA AS UniversalLipColorA)
                         VALUES ('{userKey}', '{characterUid}', '{name}', '{server}', '{serverIdentifier}', '{isMale}', '{seenIntro}', '{skippedTutorial}',
                         '{headId}', '{headPrefab}', '{hairColorR}', 
                         '{headColorPrimaryR}', '{headColorPrimaryG}', '{headColorPrimaryB}', '{headColorPrimaryA}',
@@ -254,6 +256,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                         '{facialHairColorSpecR}', '{facialHairColorSpecG}', '{facialHairColorSpecB}', '{facialHairColorSpecA}',
                         '{facialHairHealth}', '{hairColorR}', '{hairColorG}', '{hairColorB}', '{hairColorA}', '{skinColorR}', '{skinColorG}', '{skinColorB}', '{skinColorA}', '{lipColorR}', '{lipColorG}', '{lipColorB}', '{lipColorA}')
                     ";
+
 
                     using (NpgsqlCommand insertCharacterCommand = new NpgsqlCommand(insertCharacterSql, connection))
                     {
