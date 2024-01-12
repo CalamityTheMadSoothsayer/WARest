@@ -1,11 +1,12 @@
-﻿using System.Text;
-using NetCoreServer;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NetCoreServer;
+using Npgsql;
 using WorldsAdriftServer.Helper.CharacterSelection;
 using WorldsAdriftServer.Objects.CharacterSelection;
-using Npgsql;
 
 namespace WorldsAdriftServer.Handlers.CharacterScreen
 {
@@ -27,7 +28,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                 // If no characters are found, try to fetch the Steam username
                 string steamUsername = GetSteamUsername(userKey);
 
-                Console.WriteLine(steamUsername + " has connected.");
+                Console.WriteLine($"{steamUsername} has connected.");
 
                 RequestRouterHandler.userName = steamUsername;
 
@@ -47,12 +48,12 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                 (int)RequestRouterHandler.status,
                 "characterList", response.characterList,
                 "unlockedSlots", response.unlockedSlots,
-                "hasMainCharacter", true, // directly set the value
-                "havenFinished", response.havenFinished
+                "hasMainCharacter", true,
+                "havenFinished", true
             );
         }
 
-        private static string GetSteamUsername( string userKey )
+        private static string GetSteamUsername(string userKey)
         {
             // Replace with a config entry for server owners
             // obtain api key from here https://steamcommunity.com/dev/apikey
@@ -129,6 +130,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                         List<CharacterCreationData> characterList = new List<CharacterCreationData>();
                         while (characterReader.Read())
                         {
+                            // Map properties from the database to CharacterCreationData
                             CharacterCreationData characterData = new CharacterCreationData
                             (
                                 characterReader.GetInt32(characterReader.GetOrdinal("id")),
@@ -143,7 +145,6 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                                 characterReader.GetBoolean(characterReader.GetOrdinal("skipped_tutorial"))
                             );
 
-
                             characterList.Add(characterData);
                         }
 
@@ -152,11 +153,11 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                     else
                     {
                         Console.WriteLine("No characters found for the user.");
-                        return (new List<CharacterCreationData>(), HttpStatusCode.NotFound);
+                        // this is fine, user can create characters
+                        return (new List<CharacterCreationData>(), HttpStatusCode.OK);
                     }
                 }
             }
         }
-
     }
 }
