@@ -1,13 +1,24 @@
-﻿CREATE TABLE CharacterDetails (
-    Id SERIAL PRIMARY KEY,
+﻿CREATE TABLE CharacterDetails
+(
+    id SERIAL PRIMARY KEY,
     userKey VARCHAR(255) NOT NULL,
-    characterUid UUID NOT NULL,
-    Name VARCHAR(255) NOT NULL,
-    Server VARCHAR(255),
+    characterUid VARCHAR(255) NOT NULL,
+    name VARCHAR(255),
+    server VARCHAR(255),
     serverIdentifier VARCHAR(255),
-    Cosmetics JSONB,
-    UniversalColors JSONB,
+    cosmetics JSONB,
+    universalColors JSONB,
     isMale BOOLEAN,
     seenIntro BOOLEAN,
-    skippedTutorial BOOLEAN
+    skippedTutorial BOOLEAN,
+    headId VARCHAR(255),
+    headPrefab VARCHAR(255),
+    bodyId VARCHAR(255),
+    bodyPrefab VARCHAR(255),
+    feetId VARCHAR(255),
+    feetPrefab VARCHAR(255),
+    faceId VARCHAR(255),
+    facePrefab VARCHAR(255),
+    facialHairId VARCHAR(255),
+    facialHairPrefab VARCHAR(255)
 );
