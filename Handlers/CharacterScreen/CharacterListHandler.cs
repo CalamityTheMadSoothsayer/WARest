@@ -18,6 +18,12 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
             (RequestRouterHandler.characterList, RequestRouterHandler.status) = GetCharacterList(userKey);
             Console.WriteLine($"Character Retrieval for {userKey} Done.");
 
+            // If no characters are found, try to fetch the Steam username
+            RequestRouterHandler.userName = GetSteamUsername(userKey);
+
+            Console.WriteLine($"{RequestRouterHandler.userName} has connected.");
+
+            // add new character to list
             RequestRouterHandler.characterList.Add(Character.GenerateNewCharacter(serverIdentifier, RequestRouterHandler.userName));
             Console.WriteLine("Blank character created");
 
@@ -25,16 +31,6 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
 
             if (RequestRouterHandler.characterList.Count == 0)
             {
-                // If no characters are found, try to fetch the Steam username
-                string steamUsername = GetSteamUsername(userKey);
-
-                Console.WriteLine($"{steamUsername} has connected.");
-
-                RequestRouterHandler.userName = steamUsername;
-
-                // Generate a new character with the obtained Steam username
-                Character.GenerateRandomCharacter(RequestRouterHandler.Server.ToString(), "placeholder character");
-
                 response.unlockedSlots = 1;
             }
             else

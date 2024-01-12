@@ -62,8 +62,8 @@ namespace WorldsAdriftServer.Handlers
 
                     if(userKey != null)
                     {
-                        HttpSession thisSession = new HttpSession(Server);
-                        sessionId = thisSession.Id.ToString();
+                        sessionId = this.Id.ToString();
+                        Console.WriteLine($"[SESSION ID] {sessionId}");
                     }
 
                     // create session and begin storing user
