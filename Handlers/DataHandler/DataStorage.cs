@@ -29,66 +29,77 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     {
                         connection.Open();
 
-                        // Check if the character already exists for the player
-                        string checkCharacterSql = $"SELECT * FROM userdata WHERE userKey = '{userKey}'";
-                        using (NpgsqlCommand checkCharacterCommand = new NpgsqlCommand(checkCharacterSql, connection))
-                        using (NpgsqlDataReader checkCharacterReader = checkCharacterCommand.ExecuteReader())
+                        // Check if the user already exists
+                        string checkUserSql = $"SELECT * FROM userdata WHERE userKey = '{userKey}'";
+                        using (NpgsqlCommand checkUserCommand = new NpgsqlCommand(checkUserSql, connection))
+                        using (NpgsqlDataReader checkUserReader = checkUserCommand.ExecuteReader())
                         {
-                            if (checkCharacterReader.HasRows)
+                            if (checkUserReader.HasRows)
                             {
-                                // Character already exists, send appropriate response
+                                // User already exists
                                 Console.WriteLine("User data already exists.");
 
                                 previousUser = true;
 
-                                // Set variables here as needed
-                                RequestRouterHandler.status = HttpStatusCode.OK;
-
-                                return;
+                                // Check if the session matches
+                                checkUserReader.Read();
+                                if (checkUserReader["sessionToken"].ToString() != SessionId)
+                                {
+                                    // Session doesn't match, update the session token
+                                    string updateSessionSql = $"UPDATE userdata SET sessionToken = '{SessionId}' WHERE userKey = '{userKey}'";
+                                    using (NpgsqlCommand updateSessionCommand = new NpgsqlCommand(updateSessionSql, connection))
+                                    {
+                                        if (updateSessionCommand.ExecuteNonQuery() > 0)
+                                        {
+                                            // Update successful
+                                            Console.WriteLine("Session updated successfully.");
+                                            retryCount = 0;
+                                            success = true;
+                                            RequestRouterHandler.status = HttpStatusCode.OK;
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            // Update failed
+                                            Console.WriteLine($"Error updating session: {updateSessionSql}");
+                                            RequestRouterHandler.status = HttpStatusCode.InternalServerError;
+                                            break;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    // Session matches, send OK response
+                                    Console.WriteLine("Session already matches.");
+                                    RequestRouterHandler.status = HttpStatusCode.OK;
+                                    return;
+                                }
                             }
                         }
 
-                        // Check if the server session is set
-                        if (previousUser)
+                        // If the user doesn't exist, insert a new user
+                        if (!previousUser)
                         {
-                            // Game Session is not set, update the session token in UserData using a prepared statement
-                            string updateSessionSql = $"UPDATE userdata SET sessionToken = '{SessionId}' WHERE userKey = '{userKey}'";
-                            using (NpgsqlCommand updateSessionCommand = new NpgsqlCommand(updateSessionSql, connection))
+                            string insertUserSql = $"INSERT INTO userdata (userKey, sessionToken) VALUES ('{userKey}', '{SessionId}')";
+                            using (NpgsqlCommand insertUserCommand = new NpgsqlCommand(insertUserSql, connection))
                             {
-                                if (updateSessionCommand.ExecuteNonQuery() > 0)
+                                if (insertUserCommand.ExecuteNonQuery() > 0)
                                 {
-                                    // Store userKey in the session
-                                    RequestRouterHandler.sessionId = SessionId;
-                                    Console.WriteLine("Session updated successfully.");
+                                    // Insert successful
+                                    Console.WriteLine("User inserted successfully.");
                                     retryCount = 0;
                                     success = true;
-
-                                    // Set variables here as needed
                                     RequestRouterHandler.status = HttpStatusCode.OK;
-
                                     break;
                                 }
                                 else
                                 {
-                                    // Include the complete error message in the response
-                                    Console.WriteLine($"Error updating session: {updateSessionSql}");
-
-                                    // Set variables here as needed
+                                    // Insert failed
+                                    Console.WriteLine($"Error inserting user: {insertUserSql}");
                                     RequestRouterHandler.status = HttpStatusCode.InternalServerError;
-
                                     break;
                                 }
                             }
-                        }
-                        else
-                        {
-                            // Session is already set, send appropriate response
-                            Console.WriteLine("Session already set.");
-
-                            // Set variables here as needed
-                            RequestRouterHandler.status = HttpStatusCode.OK;
-
-                            return;
                         }
                     }
                 }
@@ -137,6 +148,15 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     }
                 }
             }
+
+            if (!success)
+            {
+                // Insert or update failed
+                Console.WriteLine("Insert or update failed.");
+                RequestRouterHandler.status = HttpStatusCode.InternalServerError;
+            }
+        
+
 
             if (!success)
             {
