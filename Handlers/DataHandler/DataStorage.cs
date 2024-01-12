@@ -19,6 +19,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
         {
             int retryCount = 3;
             bool success = false;
+            bool previousUser = false;
 
             while (retryCount > 0)
             {
@@ -29,14 +30,16 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                         connection.Open();
 
                         // Check if the character already exists for the player
-                        string checkCharacterSql = $"SELECT userKey FROM CharacterDetails WHERE userKey = '{userKey}'";
+                        string checkCharacterSql = $"SELECT * FROM userdata WHERE userKey = '{userKey}'";
                         using (NpgsqlCommand checkCharacterCommand = new NpgsqlCommand(checkCharacterSql, connection))
                         using (NpgsqlDataReader checkCharacterReader = checkCharacterCommand.ExecuteReader())
                         {
                             if (checkCharacterReader.HasRows)
                             {
                                 // Character already exists, send appropriate response
-                                Console.WriteLine("Character data already exists.");
+                                Console.WriteLine("User data already exists.");
+
+                                previousUser = true;
 
                                 // Set variables here as needed
                                 RequestRouterHandler.status = HttpStatusCode.OK;
@@ -46,10 +49,10 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                         }
 
                         // Check if the server session is set
-                        if (String.IsNullOrEmpty(RequestRouterHandler.sessionId))
+                        if (previousUser)
                         {
                             // Game Session is not set, update the session token in UserData using a prepared statement
-                            string updateSessionSql = $"UPDATE UserData SET sessionToken = '{SessionId}' WHERE userKey = '{userKey}'";
+                            string updateSessionSql = $"UPDATE userdata SET sessionToken = '{SessionId}' WHERE userKey = '{userKey}'";
                             using (NpgsqlCommand updateSessionCommand = new NpgsqlCommand(updateSessionSql, connection))
                             {
                                 if (updateSessionCommand.ExecuteNonQuery() > 0)
@@ -175,10 +178,12 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                                             { "userKey", reader["userKey"].ToString() },
                                             { "characterUID", reader["characterUID"].ToString() },
                                             { "sessionToken", reader["sessionToken"].ToString() }
-                                            // Add more fields as needed
                                         };
 
                                         userDataArray.Add(userData);
+
+                                        // Add user data to the dictionary
+                                        userDataDictionary.TryAdd(reader["userKey"].ToString(), userData);
                                     }
 
                                     // Include session ID in the response

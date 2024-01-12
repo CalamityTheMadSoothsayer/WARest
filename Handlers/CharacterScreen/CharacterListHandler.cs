@@ -116,7 +116,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                     if (!checkUserReader.HasRows)
                     {
                         Console.WriteLine("User not found.");
-                        return (new List<CharacterCreationData>(), HttpStatusCode.NotFound);
+                        return (new List<CharacterCreationData>(), HttpStatusCode.OK);
                     }
                 }
 
