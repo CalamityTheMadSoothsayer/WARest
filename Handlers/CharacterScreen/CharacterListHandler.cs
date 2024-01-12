@@ -5,12 +5,13 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WorldsAdriftServer.Helper.CharacterSelection;
 using WorldsAdriftServer.Objects.CharacterSelection;
+using Npgsql;
 
 namespace WorldsAdriftServer.Handlers.CharacterScreen
 {
     internal class CharacterListHandler
     {
-        internal static void HandleCharacterListRequest( HttpSession session, HttpRequest request, string serverIdentifier, string userKey )
+        internal static void HandleCharacterListRequest(HttpSession session, HttpRequest request, string serverIdentifier, string userKey)
         {
             // Check if there are characters associated with the userKey in the CharacterDetails table
             (RequestRouterHandler.characterList, RequestRouterHandler.status) = GetCharacterList(userKey);
@@ -40,21 +41,15 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                 response.unlockedSlots = RequestRouterHandler.characterList.Count;
             }
 
-            response.hasMainCharacter = true;
-            response.havenFinished = true;
-
-            JObject responseObject = (JObject)JToken.FromObject(response);
-            Console.WriteLine(responseObject.ToString());
-
-            if (responseObject != null)
-            {
-                HttpResponse httpResponse = new HttpResponse();
-                // use status from previous operation
-                httpResponse.SetBegin((int)RequestRouterHandler.status);
-                httpResponse.SetBody(responseObject.ToString());
-
-                session.SendResponseAsync(httpResponse);
-            }
+            // Use ResponseBuilder to construct and send the response
+            Utilities.ResponseBuilder.BuildAndSendResponse(
+                session,
+                (int)RequestRouterHandler.status,
+                "characterList", response.characterList,
+                "unlockedSlots", response.unlockedSlots,
+                "hasMainCharacter", true, // directly set the value
+                "havenFinished", response.havenFinished
+            );
         }
 
         private static string GetSteamUsername( string userKey )
@@ -106,67 +101,61 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
             return "STEAM USER NAME";
         }
 
-        public static (List<CharacterCreationData>, HttpStatusCode) GetCharacterList( string userKey )
+        public static (List<CharacterCreationData>, HttpStatusCode) GetCharacterList(string userKey)
         {
-            using (var httpClient = new System.Net.Http.HttpClient())
+            using (NpgsqlConnection connection = new NpgsqlConnection(DataHandler.DataStorage.connectionString))
             {
-                var requestData = new
+                connection.Open();
+
+                // Check if the user exists
+                string checkUserSql = $"SELECT * FROM UserData WHERE userKey = '{userKey}'";
+                using (NpgsqlCommand checkUserCommand = new NpgsqlCommand(checkUserSql, connection))
+                using (NpgsqlDataReader checkUserReader = checkUserCommand.ExecuteReader())
                 {
-                    UserKey = userKey
-                };
-
-                var jsonData = JsonConvert.SerializeObject(requestData);
-                var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
-
-                // Make a POST request to API endpoint to fetch character data
-                try
-                {
-                    response = httpClient.PostAsync($"/getCharacterList.php", content).Result;
-                }
-                catch (Exception ex)
-                {
-                    // Handle failure
-                    Console.WriteLine($"Error making POST request: {ex.Message}");
-                }
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseContent = response.Content.ReadAsStringAsync().Result;
-
-                    try
+                    if (!checkUserReader.HasRows)
                     {
-                        var responseObject = JsonConvert.DeserializeObject<JObject>(responseContent);
-
-                        if (responseObject != null && responseObject["status"].ToString() == "success")
-                        {
-                            // Extract and return character list from the response along with the HTTP status code
-                            var characterList = responseObject["characterList"].ToObject<List<CharacterCreationData>>();
-                            return (characterList, response.StatusCode);
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Error fetching character data: {response.StatusCode}");
-                            // Handle error accordingly
-                        }
-                    }
-                    catch (JsonReaderException)
-                    {
-                        // Handle response as a simple string (assuming it's an error message)
-                        Console.WriteLine($"Error fetching character data: {responseContent}");
+                        Console.WriteLine("User not found.");
+                        return (new List<CharacterCreationData>(), HttpStatusCode.NotFound);
                     }
                 }
-                else
-                {
-                    Console.WriteLine($"Error fetching character data: {response.StatusCode}");
-                    // Handle error accordingly
-                }
 
-                // Return an empty list and the HTTP status code if there was an error or no characters found
-                return (new List<CharacterCreationData>(), response.StatusCode);
+                // Fetch character list based on userKey
+                string selectCharacterSql = $"SELECT * FROM CharacterDetails WHERE userKey = '{userKey}'";
+                using (NpgsqlCommand selectCharacterCommand = new NpgsqlCommand(selectCharacterSql, connection))
+                using (NpgsqlDataReader characterReader = selectCharacterCommand.ExecuteReader())
+                {
+                    if (characterReader.HasRows)
+                    {
+                        List<CharacterCreationData> characterList = new List<CharacterCreationData>();
+                        while (characterReader.Read())
+                        {
+                            CharacterCreationData characterData = new CharacterCreationData
+                            (
+                                characterReader.GetInt32(characterReader.GetOrdinal("id")),
+                                characterReader.GetString(characterReader.GetOrdinal("character_uid")),
+                                characterReader.GetString(characterReader.GetOrdinal("name")),
+                                characterReader.GetString(characterReader.GetOrdinal("server")),
+                                characterReader.GetString(characterReader.GetOrdinal("server_identifier")),
+                                new Dictionary<CharacterSlotType, ItemData>(), // Initialize if needed
+                                new CharacterUniversalColors(), // Initialize if needed
+                                characterReader.GetBoolean(characterReader.GetOrdinal("is_male")),
+                                characterReader.GetBoolean(characterReader.GetOrdinal("seen_intro")),
+                                characterReader.GetBoolean(characterReader.GetOrdinal("skipped_tutorial"))
+                            );
+
+
+                            characterList.Add(characterData);
+                        }
+
+                        return (characterList, HttpStatusCode.OK);
+                    }
+                    else
+                    {
+                        Console.WriteLine("No characters found for the user.");
+                        return (new List<CharacterCreationData>(), HttpStatusCode.NotFound);
+                    }
+                }
             }
-            
         }
 
     }
