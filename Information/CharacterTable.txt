@@ -1,13 +1,13 @@
 ﻿CREATE TABLE CharacterDetails (
     Id SERIAL PRIMARY KEY,
     userKey VARCHAR(255) NOT NULL,
-    characterUid UUID NOT NULL DEFAULT uuid_generate_v4(),
+    characterUid UUID NOT NULL,
     Name VARCHAR(255) NOT NULL,
-    Server VARCHAR(255) NOT NULL,
-    serverIdentifier VARCHAR(255) NOT NULL,
-    Cosmetics JSONB NOT NULL,
-    UniversalColors JSONB NOT NULL,
-    isMale BOOLEAN NOT NULL,
-    seenIntro BOOLEAN NOT NULL,
-    skippedTutorial BOOLEAN NOT NULL
+    Server VARCHAR(255),
+    serverIdentifier VARCHAR(255),
+    Cosmetics JSONB,
+    UniversalColors JSONB,
+    isMale BOOLEAN,
+    seenIntro BOOLEAN,
+    skippedTutorial BOOLEAN
 );
