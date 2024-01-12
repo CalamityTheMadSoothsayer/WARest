@@ -82,3 +82,4 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
         }
 
     }
+}
