@@ -88,6 +88,10 @@ namespace WorldsAdriftServer.Handlers
                 {
                     CharacterNameHandler.SaveCharacterUid(request, userId, this);
                 }
+                else if (request.Method == "POST" && request.Url.Contains("character/0.3.32.0.1880/steam/1234"))
+                {
+                    CharacterDetailHandler.SaveDetails(this);
+                }
                 else if(request.Method == "GET" && request.Url == "/deploymentStatus")
                 {
                     DeploymentStatusHandler.HandleDeploymentStatusRequest(this, request, "awesome community server", "community_server", 0);
