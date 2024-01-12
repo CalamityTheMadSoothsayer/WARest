@@ -11,6 +11,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
         {
 
             JObject requestBody = JObject.Parse(request.Body);
+            Console.WriteLine(requestBody.ToString());
             try
             {
                 // Extract data from the request
