@@ -102,10 +102,10 @@ namespace WorldsAdriftServer.Handlers
                     Console.WriteLine(request + "\n\r\n\r");
                     CharacterAuthHandler.HandleCharacterAuth(this, request);
                 }
-                else if(request.Method == "POST" && request.Url.Contains("/character/") && request.Url.Contains("/steam/1234/"))
-                {
-                    CharacterSaveHandler.HandleCharacterSave(this, request);
-                }
+                //else if(request.Method == "POST" && request.Url.Contains("/character/") && request.Url.Contains("/steam/1234/"))
+                //{
+                //    CharacterSaveHandler.HandleCharacterSave(this, request);
+                //}
                 else
                 {
                     Console.WriteLine($"URL unhandled for request: \n\r {request}");
