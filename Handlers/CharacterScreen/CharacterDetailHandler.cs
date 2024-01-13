@@ -55,7 +55,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
 
                 }
 
-                RequestRouterHandler.characterList[RequestRouterHandler.characterList.Count] = character;
+                RequestRouterHandler.characterList[RequestRouterHandler.characterList.Count-1] = character;
                 RequestRouterHandler.characterList.Add(Character.GenerateNewCharacter(RequestRouterHandler.serverName, "Blank"));
 
                 CharacterListResponse response = new CharacterListResponse(RequestRouterHandler.characterList);
