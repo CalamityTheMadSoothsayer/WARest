@@ -5,6 +5,7 @@
     name VARCHAR(255),
     server VARCHAR(255),
     serverIdentifier VARCHAR(255),
+    cosmetics JSONB,
     isMale BOOLEAN,
     seenIntro BOOLEAN,
     skippedTutorial BOOLEAN,
