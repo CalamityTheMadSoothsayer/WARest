@@ -11,12 +11,11 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
         internal static void HandleCharacterAuth(HttpSession session, HttpRequest request)
         {
             // Assuming Headers is a long
-            long headersValue = (long)request.Headers;
+            long headersCount = (long)request.Headers;
 
-            // Convert the long value to a string (or the appropriate type) based on your actual implementation
-            string headersString = headersValue.ToString();
-
-            Console.WriteLine(headersString);
+            // Extracting headers from the request
+            string securityToken = GetHeaderValue(request, "Security", headersCount);
+            string characterUid = GetHeaderValue(request, "characterUid", headersCount);
 
             // Validate securityToken and characterUid if needed (future improvement)
 
@@ -36,6 +35,25 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                 // Sending the response asynchronously
                 session.SendResponseAsync(resp);
             }
+        }
+
+        private static string GetHeaderValue(HttpRequest request, string headerName, long headersCount)
+        {
+            // Implement your logic to extract the header value based on your actual scenario
+            // This is a placeholder and should be adapted to your specific situation
+            for (int i = 0; i < headersCount; i++)
+            {
+                // Adjust the index and logic based on the actual structure of request.Headers
+                string header = request.Header(i).ToString();
+
+                if (header.StartsWith(headerName))
+                {
+                    // Assuming a format like "Security: YourToken"
+                    return header.Split(':')[1]?.Trim();
+                }
+            }
+
+            return "PlaceholderHeaderValue"; // Replace with your actual logic
         }
     }
 }
