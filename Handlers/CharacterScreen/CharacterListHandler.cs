@@ -15,39 +15,43 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
     {
         internal static void HandleCharacterListRequest(HttpSession session, HttpRequest request, string serverIdentifier, string userKey)
         {
-            // Check if there are characters associated with the userKey in the CharacterDetails table
-            (RequestRouterHandler.characterList, RequestRouterHandler.status) = GetCharacterList(userKey);
-            Console.WriteLine($"Character Retrieval for {userKey} Done.");
-
-            // If no characters are found, try to fetch the Steam username
-            RequestRouterHandler.userName = GetSteamUsername(userKey);
-
-            Console.WriteLine($"{RequestRouterHandler.userName} has connected.");
-
-            // add new character to list
-            RequestRouterHandler.characterList.Add(Character.GenerateNewCharacter(serverIdentifier, RequestRouterHandler.userName));
-            Console.WriteLine("Blank character created");
-
-            CharacterListResponse response = new CharacterListResponse(RequestRouterHandler.characterList);
-
-            if (RequestRouterHandler.characterList.Count == 0)
+            try
             {
-                response.unlockedSlots = 1;
-            }
-            else
-            {
-                response.unlockedSlots = RequestRouterHandler.characterList.Count;
-            }
+                // Check if there are characters associated with the userKey in the CharacterDetails table
+                (RequestRouterHandler.characterList, RequestRouterHandler.status) = GetCharacterList(userKey);
+                Console.WriteLine($"Character Retrieval for {userKey} Done.");
 
-            // Use ResponseBuilder to construct and send the response
-            Utilities.ResponseBuilder.BuildAndSendResponse(
-                session,
-                (int)RequestRouterHandler.status,
-                "characterList", response.characterList,
-                "unlockedSlots", response.unlockedSlots,
-                "hasMainCharacter", true,
-                "havenFinished", true
-            );
+                // If no characters are found, try to fetch the Steam username
+                RequestRouterHandler.userName = GetSteamUsername(userKey);
+
+                Console.WriteLine($"{RequestRouterHandler.userName} has connected.");
+
+                // add a new character to the list
+                RequestRouterHandler.characterList.Add(Character.GenerateNewCharacter(serverIdentifier, RequestRouterHandler.userName));
+                Console.WriteLine("Blank character created");
+
+                CharacterListResponse response = new CharacterListResponse(RequestRouterHandler.characterList);
+
+                // Determine the number of unlocked slots
+                response.unlockedSlots = Math.Max(1, RequestRouterHandler.characterList.Count);
+
+                // Use ResponseBuilder to construct and send the response
+                Utilities.ResponseBuilder.BuildAndSendResponse(
+                    session,
+                    (int)RequestRouterHandler.status,
+                    "characterList", response.characterList,
+                    "unlockedSlots", response.unlockedSlots,
+                    "hasMainCharacter", true,
+                    "havenFinished", true
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error handling character list request: {ex.Message}");
+                // Handle the exception or log it appropriately
+                // Set an appropriate status code for the response
+                RequestRouterHandler.status = HttpStatusCode.InternalServerError;
+            }
         }
 
         private static string GetSteamUsername(string userKey)
@@ -198,18 +202,25 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
             CharacterUniversalColors universalColors = new CharacterUniversalColors();
 
             // Add logic to extract universal colors properties from the reader
-            string universalColorsJson = reader.GetString(reader.GetOrdinal("universalcolors"));
-
-            if (!string.IsNullOrEmpty(universalColorsJson))
-            {
-                JObject universalColorsObject = JObject.Parse(universalColorsJson);
-
-                universalColors.HairColor = ExtractColor(universalColorsObject["HairColor"]);
-                universalColors.SkinColor = ExtractColor(universalColorsObject["SkinColor"]);
-                universalColors.LipColor = ExtractColor(universalColorsObject["LipColor"]);
-            }
+            universalColors.HairColor = ExtractUnityColor(reader, "universalcolorshaircolor");
+            universalColors.SkinColor = ExtractUnityColor(reader, "universalcolorsskincolor");
+            universalColors.LipColor = ExtractUnityColor(reader, "universalcolorslipcolor");
 
             return universalColors;
+        }
+
+        // Helper method to extract a UnityColor from the reader based on field names
+        private static UnityColor ExtractUnityColor(NpgsqlDataReader reader, string fieldNamePrefix)
+        {
+            UnityColor color = new UnityColor
+            {
+                r = reader.GetFloat(reader.GetOrdinal($"{fieldNamePrefix}r")),
+                g = reader.GetFloat(reader.GetOrdinal($"{fieldNamePrefix}g")),
+                b = reader.GetFloat(reader.GetOrdinal($"{fieldNamePrefix}b")),
+                a = reader.GetFloat(reader.GetOrdinal($"{fieldNamePrefix}a")),
+            };
+
+            return color;
         }
 
         // Helper method to extract item data from the cosmetics JSON
