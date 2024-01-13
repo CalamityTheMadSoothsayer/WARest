@@ -214,14 +214,15 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
         {
             UnityColor color = new UnityColor
             {
-                r = reader.GetFloat(reader.GetOrdinal($"{fieldNamePrefix}r")),
-                g = reader.GetFloat(reader.GetOrdinal($"{fieldNamePrefix}g")),
-                b = reader.GetFloat(reader.GetOrdinal($"{fieldNamePrefix}b")),
-                a = reader.GetFloat(reader.GetOrdinal($"{fieldNamePrefix}a")),
+                r = (float)reader.GetDouble(reader.GetOrdinal($"{fieldNamePrefix}r")),
+                g = (float)reader.GetDouble(reader.GetOrdinal($"{fieldNamePrefix}g")),
+                b = (float)reader.GetDouble(reader.GetOrdinal($"{fieldNamePrefix}b")),
+                a = (float)reader.GetDouble(reader.GetOrdinal($"{fieldNamePrefix}a")) 
             };
 
             return color;
         }
+
 
         // Helper method to extract item data from the cosmetics JSON
         private static ItemData ExtractItemData(JObject cosmeticsObject, string slotName)
