@@ -99,6 +99,7 @@ namespace WorldsAdriftServer.Handlers
                 }
                 else if(request.Method == "GET" && request.Url == "/authorizeCharacter")
                 {
+                    Console.WriteLine(request + "\n\r\n\r");
                     CharacterAuthHandler.HandleCharacterAuth(this, request);
                 }
                 else if(request.Method == "POST" && request.Url.Contains("/character/") && request.Url.Contains("/steam/1234/"))
