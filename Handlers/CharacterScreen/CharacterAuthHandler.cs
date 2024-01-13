@@ -14,7 +14,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
         internal static void HandleCharacterAuth(HttpSession session, HttpRequest request )
         {
             HttpResponse resp = new HttpResponse();
-            CharacterAuthResponse authResp = new CharacterAuthResponse("WarToken", RequestRouterHandler.userId, 999, "12.12.12", true);
+            CharacterAuthResponse authResp = new CharacterAuthResponse("WarToken", RequestRouterHandler.userId, 123, "12.12.12", true);
 
             JObject respO = (JObject)JToken.FromObject(authResp);
             if(respO != null)
