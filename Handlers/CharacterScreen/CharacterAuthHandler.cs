@@ -20,13 +20,12 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
             // Validate securityToken and characterUid if needed (future improvement)
 
             // Creating a response object
-            CharacterAuthResponse authResp = new CharacterAuthResponse("token", RequestRouterHandler.userId, 123, "12.12.12", true);
+            HttpResponse resp = new HttpResponse();
+            CharacterAuthResponse authResp = new CharacterAuthResponse("token", "1", 123, "12.12.12", true);
 
             // Converting the response object to JSON
             JObject respO = (JObject)JToken.FromObject(authResp);
 
-            // Creating the HTTP response
-            HttpResponse resp = new HttpResponse();
             if (respO != null)
             {
                 resp.SetBegin(200);
