@@ -7,6 +7,7 @@ using NetCoreServer;
 using Npgsql;
 using WorldsAdriftServer.Helper.CharacterSelection;
 using WorldsAdriftServer.Objects.CharacterSelection;
+using WorldsAdriftServer.Objects.UnityObjects;
 
 namespace WorldsAdriftServer.Handlers.CharacterScreen
 {
@@ -117,13 +118,15 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                 }
 
                 // Fetch character list based on userKey
-                string selectCharacterSql = $"SELECT * FROM CharacterDetails WHERE userKey = '{userKey}'";
+                string selectCharacterSql = $"SELECT top 1 * FROM CharacterDetails WHERE userKey = '{userKey}'";
+
                 using (NpgsqlCommand selectCharacterCommand = new NpgsqlCommand(selectCharacterSql, connection))
                 using (NpgsqlDataReader characterReader = selectCharacterCommand.ExecuteReader())
                 {
                     if (characterReader.HasRows)
                     {
                         List<CharacterCreationData> characterList = new List<CharacterCreationData>();
+
                         while (characterReader.Read())
                         {
                             // Map properties from the database to CharacterCreationData
@@ -141,6 +144,10 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                                 characterReader.GetBoolean(characterReader.GetOrdinal("skippedtutorial"))
                             );
 
+                            // Retrieve cosmetics and universal colors properties
+                            characterData.Cosmetics = ExtractCosmetics(characterReader);
+                            characterData.UniversalColors = ExtractUniversalColors(characterReader);
+
                             characterList.Add(characterData);
                         }
 
@@ -155,5 +162,98 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                 }
             }
         }
+
+        // Helper method to extract cosmetics properties from the reader
+        private static Dictionary<CharacterSlotType, ItemData> ExtractCosmetics(NpgsqlDataReader reader)
+        {
+            Dictionary<CharacterSlotType, ItemData> cosmetics = new Dictionary<CharacterSlotType, ItemData>();
+
+            // Add logic to extract cosmetics properties from the reader
+            string cosmeticsJson = reader.GetString(reader.GetOrdinal("cosmetics"));
+
+            if (!string.IsNullOrEmpty(cosmeticsJson))
+            {
+                JObject cosmeticsObject = JObject.Parse(cosmeticsJson);
+
+                foreach (CharacterSlotType slotType in Enum.GetValues(typeof(CharacterSlotType)))
+                {
+                    if (slotType != CharacterSlotType.None)
+                    {
+                        string slotName = slotType.ToString();
+                        var itemData = ExtractItemData(cosmeticsObject, slotName);
+                        if (itemData != null)
+                        {
+                            cosmetics[slotType] = itemData;
+                        }
+                    }
+                }
+            }
+
+            return cosmetics;
+        }
+
+        // Helper method to extract universal colors properties from the reader
+        private static CharacterUniversalColors ExtractUniversalColors(NpgsqlDataReader reader)
+        {
+            CharacterUniversalColors universalColors = new CharacterUniversalColors();
+
+            // Add logic to extract universal colors properties from the reader
+            string universalColorsJson = reader.GetString(reader.GetOrdinal("universalcolors"));
+
+            if (!string.IsNullOrEmpty(universalColorsJson))
+            {
+                JObject universalColorsObject = JObject.Parse(universalColorsJson);
+
+                universalColors.HairColor = ExtractColor(universalColorsObject["HairColor"]);
+                universalColors.SkinColor = ExtractColor(universalColorsObject["SkinColor"]);
+                universalColors.LipColor = ExtractColor(universalColorsObject["LipColor"]);
+            }
+
+            return universalColors;
+        }
+
+        // Helper method to extract item data from the cosmetics JSON
+        private static ItemData ExtractItemData(JObject cosmeticsObject, string slotName)
+        {
+            var itemDataJson = cosmeticsObject[slotName];
+
+            if (itemDataJson != null)
+            {
+                return new ItemData
+                (
+                    itemDataJson["Id"]?.ToString(),
+                    itemDataJson["Prefab"]?.ToString(),
+                    ExtractColorProperties(itemDataJson["ColorProps"]),
+                    itemDataJson["Health"]?.ToObject<float>() ?? 0.0f
+                );
+            }
+
+            return null;
+        }
+
+        // Helper method to extract color properties
+        private static ColorProperties ExtractColorProperties(JToken colorPropsJson)
+        {
+            return new ColorProperties
+            {
+                PrimaryColor = ExtractColor(colorPropsJson?["PrimaryColor"]),
+                SecondaryColor = ExtractColor(colorPropsJson?["SecondaryColor"]),
+                TertiaryColor = ExtractColor(colorPropsJson?["TertiaryColor"]),
+                SpecColor = ExtractColor(colorPropsJson?["SpecColor"])
+            };
+        }
+
+        // Helper method to extract a UnityColor from a JSON object
+        private static UnityColor ExtractColor(JToken colorJson)
+        {
+            return new UnityColor
+            {
+                r = colorJson?["r"]?.ToObject<float>() ?? 0.0f,
+                g = colorJson?["g"]?.ToObject<float>() ?? 0.0f,
+                b = colorJson?["b"]?.ToObject<float>() ?? 0.0f,
+                a = colorJson?["a"]?.ToObject<float>() ?? 0.0f
+            };
+        }
+
     }
 }
