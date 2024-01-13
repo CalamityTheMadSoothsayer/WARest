@@ -57,7 +57,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                         insertCharacterCommand.Parameters.AddWithValue("@CharacterUid", character.characterUid);
                         insertCharacterCommand.Parameters.AddWithValue("@Name", character.Name);
                         insertCharacterCommand.Parameters.AddWithValue("@Server", RequestRouterHandler.serverName);
-                        insertCharacterCommand.Parameters.AddWithValue("@ServerIdentifier", RequestRouterHandler.Server);
+                        insertCharacterCommand.Parameters.AddWithValue("@ServerIdentifier", RequestRouterHandler.desiredServerName);
                         insertCharacterCommand.Parameters.AddWithValue("@Cosmetics", NpgsqlTypes.NpgsqlDbType.Jsonb, JsonConvert.SerializeObject(character.Cosmetics));
                         insertCharacterCommand.Parameters.AddWithValue("@IsMale", character.isMale);
                         insertCharacterCommand.Parameters.AddWithValue("@SeenIntro", character.seenIntro);

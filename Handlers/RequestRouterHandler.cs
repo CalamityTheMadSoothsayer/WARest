@@ -26,6 +26,7 @@ namespace WorldsAdriftServer.Handlers
         public static CharacterListResponse CharacterResponse = new CharacterListResponse(characterList);
 
         public static string serverName;
+        public static string desiredServerName;
         public static string dbName;
         public static string username;
         public static string password;
@@ -141,6 +142,7 @@ namespace WorldsAdriftServer.Handlers
                 XmlNode dbNode = xmlDoc.SelectSingleNode("/configuration/database/dbname");
                 XmlNode userNode = xmlDoc.SelectSingleNode("/configuration/database/username");
                 XmlNode passwordNode = xmlDoc.SelectSingleNode("/configuration/database/password");
+                XmlNode dServerName = xmlDoc.SelectSingleNode("/configuration/database/desiredservername");
 
                 // Check for null before accessing node values
                 if (serverNode != null && dbNode != null && userNode != null && passwordNode != null)
@@ -149,6 +151,8 @@ namespace WorldsAdriftServer.Handlers
                     dbName = dbNode.InnerText;
                     username = userNode.InnerText;
                     password = passwordNode.InnerText;
+
+                    desiredServerName = dServerName.InnerText;
 
                     Console.WriteLine($"Loaded serverName: {RequestRouterHandler.serverName}");
                     Console.WriteLine($"Loaded dbName: {RequestRouterHandler.dbName}");

@@ -48,7 +48,7 @@ namespace WorldsAdriftServer.Helper.CharacterSelection
                                                                 default(ColorProperties),
                                                                 100f));
 
-            return new CharacterCreationData(1, RequestRouterHandler.sessionId.ToString(), characterName, "serverName?", serverIdentifier, cosmetics, colors, true, false, false);
+            return new CharacterCreationData(1, RequestRouterHandler.sessionId.ToString(), characterName, RequestRouterHandler.desiredServerName, serverIdentifier, cosmetics, colors, true, false, false);
         }
         /*
          * generates a character without cosmetics which reflects as an empty slot in the character select screen.
@@ -69,7 +69,7 @@ namespace WorldsAdriftServer.Helper.CharacterSelection
             // generate character uid
             RequestRouterHandler.characterUID = Guid.NewGuid().ToString();
             // find a way to let server owners set servername
-            return new CharacterCreationData(1, RequestRouterHandler.characterUID, characterName, "serverName?", serverIdentifier, null, colors, true, true, true);
+            return new CharacterCreationData(1, RequestRouterHandler.characterUID, characterName, RequestRouterHandler.desiredServerName, serverIdentifier, null, colors, true, true, true);
         }
     }
 }
