@@ -37,12 +37,12 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
 
                     string insertCharacterSql = $@"
                         INSERT INTO characterdetails
-                        (id, characterUid, name, server, serverIdentifier, isMale, seenIntro, skippedTutorial, 
+                        (id, userKey, characterUid, name, server, serverIdentifier, isMale, seenIntro, skippedTutorial, 
                         universalColorsHairColorR, universalColorsHairColorG, universalColorsHairColorB, universalColorsHairColorA,
                         universalColorsSkinColorR, universalColorsSkinColorG, universalColorsSkinColorB, universalColorsSkinColorA,
                         universalColorsLipColorR, universalColorsLipColorG, universalColorsLipColorB, universalColorsLipColorA)
                         VALUES
-                        ({character.Id}, '{character.characterUid}', '{character.Name}', '{character.Server}', '{character.serverIdentifier}', {character.isMale}, {character.seenIntro}, {character.skippedTutorial},
+                        ({character.Id}, '{userKey}', '{character.characterUid}', '{character.Name}', '{character.Server}', '{character.serverIdentifier}', {character.isMale}, {character.seenIntro}, {character.skippedTutorial},
                         {character.UniversalColors.HairColor.r}, {character.UniversalColors.HairColor.g}, {character.UniversalColors.HairColor.b}, {character.UniversalColors.HairColor.a},
                         {character.UniversalColors.SkinColor.r}, {character.UniversalColors.SkinColor.g}, {character.UniversalColors.SkinColor.b}, {character.UniversalColors.SkinColor.a},
                         {character.UniversalColors.LipColor.r}, {character.UniversalColors.LipColor.g}, {character.UniversalColors.LipColor.b}, {character.UniversalColors.LipColor.a})
