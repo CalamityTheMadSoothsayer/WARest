@@ -26,10 +26,12 @@ namespace WorldsAdriftServer.Handlers
         public static CharacterListResponse CharacterResponse = new CharacterListResponse(characterList);
 
         public static string serverName;
-        public static string desiredServerName;
         public static string dbName;
         public static string username;
         public static string password;
+
+        public static string desiredServerName;
+        public static string serverIdentity;
 
         public RequestRouterHandler( HttpServer server ) : base(server) 
         {
@@ -95,7 +97,7 @@ namespace WorldsAdriftServer.Handlers
                 }
                 else if(request.Method == "GET" && request.Url == "/deploymentStatus")
                 {
-                    DeploymentStatusHandler.HandleDeploymentStatusRequest(this, request, "awesome community server", "community_server", 0);
+                    DeploymentStatusHandler.HandleDeploymentStatusRequest(this, request, desiredServerName, "community_server", 0);
                 }
                 else if(request.Method == "GET" && request.Url == "/authorizeCharacter")
                 {
@@ -143,6 +145,7 @@ namespace WorldsAdriftServer.Handlers
                 XmlNode userNode = xmlDoc.SelectSingleNode("/configuration/database/username");
                 XmlNode passwordNode = xmlDoc.SelectSingleNode("/configuration/database/password");
                 XmlNode dServerName = xmlDoc.SelectSingleNode("/configuration/database/desiredservername");
+                XmlNode dServerId = xmlDoc.SelectSingleNode("/configuration/database/serveridentity");
 
                 // Check for null before accessing node values
                 if (serverNode != null && dbNode != null && userNode != null && passwordNode != null)
@@ -153,6 +156,7 @@ namespace WorldsAdriftServer.Handlers
                     password = passwordNode.InnerText;
 
                     desiredServerName = dServerName.InnerText;
+                    serverIdentity = dServerId.InnerText;
 
                     Console.WriteLine($"Loaded serverName: {RequestRouterHandler.serverName}");
                     Console.WriteLine($"Loaded dbName: {RequestRouterHandler.dbName}");

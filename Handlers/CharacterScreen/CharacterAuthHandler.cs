@@ -47,12 +47,12 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
 
                 if (header.StartsWith(headerName))
                 {
-                    // Assuming a format like "Security: YourToken"
+                    // Assuming a format like "Security: WarToken"
                     return header.Split(':')[1]?.Trim();
                 }
             }
 
-            return "PlaceholderHeaderValue"; // Replace with your actual logic
+            return "PlaceholderHeaderValue"; // Replace with actual logic
         }
     }
 }
