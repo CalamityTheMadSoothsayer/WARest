@@ -118,7 +118,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                 }
 
                 // Fetch character list based on userKey
-                string selectCharacterSql = $"SELECT top 1 * FROM CharacterDetails WHERE userKey = '{userKey}'";
+                string selectCharacterSql = $"SELECT * FROM CharacterDetails WHERE userKey = '{userKey}'";
 
                 using (NpgsqlCommand selectCharacterCommand = new NpgsqlCommand(selectCharacterSql, connection))
                 using (NpgsqlDataReader characterReader = selectCharacterCommand.ExecuteReader())
