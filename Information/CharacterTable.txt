@@ -1,6 +1,7 @@
 ﻿CREATE TABLE IF NOT EXISTS characterdetails (
     id SERIAL PRIMARY KEY,
-    characterUid VARCHAR(255) NOT NULL,
+    userKey VARCHAR(255) NOT NULL,
+    characterUid VARCHAR(255),
     name VARCHAR(255),
     server VARCHAR(255),
     serverIdentifier VARCHAR(255),
