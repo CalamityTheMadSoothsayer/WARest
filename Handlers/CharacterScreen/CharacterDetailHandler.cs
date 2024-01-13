@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Reflection;
 using WorldsAdriftServer.Objects.CharacterSelection;
 using WorldsAdriftServer.Objects.UnityObjects;
+using Newtonsoft.Json;
 
 namespace WorldsAdriftServer.Handlers.CharacterScreen
 {
@@ -35,23 +36,51 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                 {
                     connection.Open();
 
-                    string insertCharacterSql = $@"
+                    string insertCharacterSql = @"
                         INSERT INTO characterdetails
                         (id, userKey, characterUid, name, server, serverIdentifier, cosmetics, isMale, seenIntro, skippedTutorial, 
                         universalColorsHairColorR, universalColorsHairColorG, universalColorsHairColorB, universalColorsHairColorA,
                         universalColorsSkinColorR, universalColorsSkinColorG, universalColorsSkinColorB, universalColorsSkinColorA,
                         universalColorsLipColorR, universalColorsLipColorG, universalColorsLipColorB, universalColorsLipColorA)
                         VALUES
-                        ({character.Id}, '{userKey}', '{character.characterUid}', '{character.Name}', '{character.Server}', '{character.serverIdentifier}', {character.Cosmetics}, {character.isMale}, {character.seenIntro}, {character.skippedTutorial},
-                        {character.UniversalColors.HairColor.r}, {character.UniversalColors.HairColor.g}, {character.UniversalColors.HairColor.b}, {character.UniversalColors.HairColor.a},
-                        {character.UniversalColors.SkinColor.r}, {character.UniversalColors.SkinColor.g}, {character.UniversalColors.SkinColor.b}, {character.UniversalColors.SkinColor.a},
-                        {character.UniversalColors.LipColor.r}, {character.UniversalColors.LipColor.g}, {character.UniversalColors.LipColor.b}, {character.UniversalColors.LipColor.a})
+                        (@Id, @UserKey, @CharacterUid, @Name, @Server, @ServerIdentifier, @Cosmetics, @IsMale, @SeenIntro, @SkippedTutorial,
+                        @HairColorR, @HairColorG, @HairColorB, @HairColorA,
+                        @SkinColorR, @SkinColorG, @SkinColorB, @SkinColorA,
+                        @LipColorR, @LipColorG, @LipColorB, @LipColorA)
                     ";
 
                     using (NpgsqlCommand insertCharacterCommand = new NpgsqlCommand(insertCharacterSql, connection))
                     {
+                        // Add parameters to the command
+                        insertCharacterCommand.Parameters.AddWithValue("@Id", character.Id);
+                        insertCharacterCommand.Parameters.AddWithValue("@UserKey", userKey);
+                        insertCharacterCommand.Parameters.AddWithValue("@CharacterUid", character.characterUid);
+                        insertCharacterCommand.Parameters.AddWithValue("@Name", character.Name);
+                        insertCharacterCommand.Parameters.AddWithValue("@Server", RequestRouterHandler.serverName);
+                        insertCharacterCommand.Parameters.AddWithValue("@ServerIdentifier", RequestRouterHandler.Server);
+                        insertCharacterCommand.Parameters.AddWithValue("@Cosmetics", NpgsqlTypes.NpgsqlDbType.Jsonb, JsonConvert.SerializeObject(character.Cosmetics));
+                        insertCharacterCommand.Parameters.AddWithValue("@IsMale", character.isMale);
+                        insertCharacterCommand.Parameters.AddWithValue("@SeenIntro", character.seenIntro);
+                        insertCharacterCommand.Parameters.AddWithValue("@SkippedTutorial", character.skippedTutorial);
+                        
+                        insertCharacterCommand.Parameters.AddWithValue("@HairColorR", character.UniversalColors.HairColor.r);
+                        insertCharacterCommand.Parameters.AddWithValue("@HairColorG", character.UniversalColors.HairColor.g);
+                        insertCharacterCommand.Parameters.AddWithValue("@HairColorB", character.UniversalColors.HairColor.b);
+                        insertCharacterCommand.Parameters.AddWithValue("@HairColorA", character.UniversalColors.HairColor.a);
+
+                        insertCharacterCommand.Parameters.AddWithValue("@SkinColorR", character.UniversalColors.SkinColor.r);
+                        insertCharacterCommand.Parameters.AddWithValue("@SkinColorG", character.UniversalColors.SkinColor.g);
+                        insertCharacterCommand.Parameters.AddWithValue("@SkinColorB", character.UniversalColors.SkinColor.b);
+                        insertCharacterCommand.Parameters.AddWithValue("@SkinColorA", character.UniversalColors.SkinColor.a);
+
+                        insertCharacterCommand.Parameters.AddWithValue("@LipColorR", character.UniversalColors.LipColor.r);
+                        insertCharacterCommand.Parameters.AddWithValue("@LipColorG", character.UniversalColors.LipColor.g);
+                        insertCharacterCommand.Parameters.AddWithValue("@LipColorB", character.UniversalColors.LipColor.b);
+                        insertCharacterCommand.Parameters.AddWithValue("@LipColorA", character.UniversalColors.LipColor.a);
+                        // Execute the query
                         insertCharacterCommand.ExecuteNonQuery();
                     }
+
 
                 }
 
