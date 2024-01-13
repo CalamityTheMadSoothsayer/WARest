@@ -23,6 +23,7 @@ namespace WorldsAdriftServer.Handlers.ServerStatus
             Dictionary<string, ServerStatusRecord> serverStatus = new Dictionary<string, ServerStatusRecord>();
             serverStatus.Add(serverIdentifier, new ServerStatusRecord(serverName, serverIdentifier, Objects.DeploymentStatus.ServerStatus.UP, population.ToString()));
 
+            // used to get a real status
             (bsList, status) = CharacterListHandler.GetCharacterList(RequestRouterHandler.userId);
 
             JObject respO = (JObject)JToken.FromObject(serverStatus);
