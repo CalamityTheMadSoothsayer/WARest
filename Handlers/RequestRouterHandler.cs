@@ -103,6 +103,14 @@ namespace WorldsAdriftServer.Handlers
                 {
                     CharacterAuthHandler.HandleCharacterAuth(this, request);
                 }
+                else if(request.Method == "GET" && request.Url == "/componentData")
+                {
+                    ComponentHandler.getComponentDate(this, request);
+                }
+                else if (request.Method == "POST" && request.Url == "/componentData")
+                {
+                    ComponentHandler.setComponentDate(this, request);
+                }
                 //else if(request.Method == "POST" && request.Url.Contains("/character/") && request.Url.Contains("/steam/1234/"))
                 //{
                 //    CharacterSaveHandler.HandleCharacterSave(this, request);

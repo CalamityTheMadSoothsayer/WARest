@@ -26,5 +26,19 @@ namespace WorldsAdriftServer.Utilities
 
             session.SendResponseAsync(response);
         }
+
+        public static void BuildAndSendErrorResponse(HttpSession session, string errorMessage)
+        {
+            JObject errorObj = new JObject
+            {
+                { "error", errorMessage }
+            };
+
+            HttpResponse response = new HttpResponse();
+            response.SetBegin(400); // You can adjust the HTTP status code for errors
+            response.SetBody(errorObj.ToString());
+
+            session.SendResponseAsync(response);
+        }
     }
 }
