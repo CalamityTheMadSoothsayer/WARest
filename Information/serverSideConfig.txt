@@ -1,0 +1,10 @@
+﻿<configuration>
+  <database>
+    <servername>localhost</servername>
+    <dbname>database name here</dbname>
+    <username>db user here</username>
+    <password>db password here</password>
+    <desiredservername>community_server</desiredservername>
+    <serveridentity>server ip here</serveridentity>
+  </database>
+</configuration>

@@ -1,0 +1,5 @@
+﻿CREATE TABLE gameobjects (
+    entityid bigint,
+    componentid bigint,
+    data jsonb
+);

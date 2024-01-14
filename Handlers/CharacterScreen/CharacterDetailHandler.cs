@@ -19,7 +19,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
             {
                 CharacterCreationData character = new CharacterCreationData
                 (
-                    requestBody["Id"]?.ToObject<int>() ?? 0,
+                    requestBody["Id"]?.ToObject<int>() ?? int.Parse(userKey),
                     requestBody["characterUid"]?.ToString(),
                     requestBody["Name"]?.ToString(),
                     requestBody["Server"]?.ToString(),
