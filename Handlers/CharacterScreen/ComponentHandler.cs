@@ -10,84 +10,83 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
         private static string connectionString = DataHandler.DataStorage.connectionString;
 
         internal static void getComponentDate(HttpSession session, HttpRequest request)
-{
-    try
-    {
-        // Extract entityId from the request.Url manually
-        string queryString = request.Url.Split('=')[1];
-
-        Console.WriteLine(queryString);
-
-        // Parse the query string to get the entityId value
-        if (ParseQueryString(queryString, "entityId", out long entityId))
         {
-            using (var connection = new NpgsqlConnection(connectionString))
+            // Extract entityId from the request.Url manually
+            string queryString = request.Url.Split('=')[1];
+
+            Console.WriteLine(queryString);
+            try
             {
-                connection.Open();
-
-                using (var cmd = new NpgsqlCommand("SELECT componentid, data FROM gameobjects WHERE entityid = @entityId", connection))
+                // Parse the query string to get the entityId value
+                if (ParseQueryString(queryString, "entityId", out long entityId))
                 {
-                    cmd.Parameters.AddWithValue("entityId", entityId);
-
-                    using (var reader = cmd.ExecuteReader())
+                    using (var connection = new NpgsqlConnection(connectionString))
                     {
-                        JObject responseData = new JObject();
+                        connection.Open();
 
-                        while (reader.Read())
+                        using (var cmd = new NpgsqlCommand("SELECT componentid, data FROM gameobjects WHERE entityid = @entityId", connection))
                         {
-                            long componentId = reader.GetInt64(0);
-                            string jsonData = reader.GetString(1);
+                            cmd.Parameters.AddWithValue("entityId", entityId);
 
-                            // Add component data to the JSON response
-                            responseData.Add(new JProperty($"component_{componentId}", JObject.Parse(jsonData)));
-                        }
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                JObject responseData = new JObject();
 
-                        if (responseData.Count > 0)
-                        {
-                            // Build response with entityId as the root and components as keys
-                            Utilities.ResponseBuilder.BuildAndSendResponse(
-                                session,
-                                (int)RequestRouterHandler.status,
-                                "entityId", entityId,
-                                "components", responseData
-                            );
-                        }
-                        else
-                        {
-                            ResponseBuilder.BuildAndSendResponse(session, 500, "status", "No data found for the specified entity.");
+                                while (reader.Read())
+                                {
+                                    long componentId = reader.GetInt64(0);
+                                    string jsonData = reader.GetString(1);
+
+                                    // Add component data to the JSON response
+                                    responseData.Add(new JProperty($"component_{componentId}", JObject.Parse(jsonData)));
+                                }
+
+                                if (responseData.Count > 0)
+                                {
+                                    // Build response with entityId as the root and components as keys
+                                    Utilities.ResponseBuilder.BuildAndSendResponse(
+                                        session,
+                                        (int)RequestRouterHandler.status,
+                                        "entityId", entityId,
+                                        "components", responseData
+                                    );
+                                }
+                                else
+                                {
+                                    ResponseBuilder.BuildAndSendResponse(session, 500, "status", "No data found for the specified entity.");
+                                }
+                            }
                         }
                     }
                 }
+                else
+                {
+                    ResponseBuilder.BuildAndSendResponse(session, 400, "status", "Invalid or missing entityId in the query parameters.");
+                }
+            }
+            catch (Exception ex)
+            {
+                ResponseBuilder.BuildAndSendResponse(session, 500, "status", "error: " + ex.Message);
             }
         }
-        else
+
+        private static bool ParseQueryString(string queryString, string key, out long value)
         {
-            ResponseBuilder.BuildAndSendResponse(session, 400, "status", "Invalid or missing entityId in the query parameters.");
+            value = 0;
+            var queryParameters = queryString.TrimStart('?').Split('&');
+
+            foreach (var parameter in queryParameters)
+            {
+                var keyValue = parameter.Split('=');
+
+                if (keyValue.Length == 2 && keyValue[0] == key && long.TryParse(keyValue[1], out value))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
-    }
-    catch (Exception ex)
-    {
-        ResponseBuilder.BuildAndSendResponse(session, 500, "status", "error: " + ex.Message);
-    }
-}
-
-private static bool ParseQueryString(string queryString, string key, out long value)
-{
-    value = 0;
-    var queryParameters = queryString.TrimStart('?').Split('&');
-
-    foreach (var parameter in queryParameters)
-    {
-        var keyValue = parameter.Split('=');
-
-        if (keyValue.Length == 2 && keyValue[0] == key && long.TryParse(keyValue[1], out value))
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
 
 
         internal static void setComponentDate(HttpSession session, HttpRequest request)
