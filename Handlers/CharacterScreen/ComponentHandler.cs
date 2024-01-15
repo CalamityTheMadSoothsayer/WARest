@@ -42,7 +42,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                                 // Build response with entityId as the root and components as keys
                                 Utilities.ResponseBuilder.BuildAndSendResponse(
                                     session,
-                                    (int)RequestRouterHandler.status,
+                                    200,
                                     "entityId", entityId,
                                     "components", responseData
                                 );
