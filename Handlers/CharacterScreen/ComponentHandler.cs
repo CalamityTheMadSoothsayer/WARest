@@ -16,6 +16,8 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
         // Extract entityId from the request.Url manually
         string queryString = request.Url.Split('=')[1];
 
+        Console.WriteLine(queryString);
+
         // Parse the query string to get the entityId value
         if (ParseQueryString(queryString, "entityId", out long entityId))
         {
