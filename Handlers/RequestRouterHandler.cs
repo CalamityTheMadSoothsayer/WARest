@@ -103,14 +103,11 @@ namespace WorldsAdriftServer.Handlers
                 {
                     CharacterAuthHandler.HandleCharacterAuth(this, request);
                 }
-                else if(request.Method == "GET" && request.Url == "/componentData")
+                else if(request.Method == "GET" && request.Url.Contains("/componentData"))
                 {
-                    var entityId = long.Parse(request.Url.Split("=")[1]);
-
-                    Console.WriteLine("ENT ID: " + entityId);
                     ComponentHandler.getComponentDate(this, request);
                 }
-                else if (request.Method == "POST" && request.Url == "/componentData")
+                else if (request.Method == "POST" && request.Url.Contains("/componentData"))
                 {
                     ComponentHandler.setComponentDate(this, request);
                 }
