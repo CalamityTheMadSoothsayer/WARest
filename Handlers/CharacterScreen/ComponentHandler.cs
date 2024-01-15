@@ -50,8 +50,8 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
 
                                     if (responseData.Count > 0)
                                     {
-                                        // Build response with entityId as the root and components as keys
-                                        Utilities.ResponseBuilder.BuildAndSendResponse(
+                                            // Build response with entityId as the root and components as keys
+                                            ResponseBuilder.BuildAndSendResponse(
                                             session,
                                             (int)RequestRouterHandler.status,
                                             "entityId", entityId,
@@ -60,7 +60,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                                     }
                                     else
                                     {
-                                        ResponseBuilder.BuildAndSendResponse(session, 500, "status", "No data found for the specified entity.");
+                                        ResponseBuilder.BuildAndSendResponse(session, 200, "status", "No data found for the specified entity.");
                                     }
                                 }
                             }
