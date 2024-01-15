@@ -24,7 +24,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                     // Remove everything before and including '='
                     string entityIdStr = queryString.Substring(equalSignIndex + 1);
 
-                    Console.WriteLine(entityIdStr);
+                    Console.WriteLine("ENTITY ID: " + entityIdStr);
 
                     // Parse the entityId value
                     if (long.TryParse(entityIdStr, out long entityId))
