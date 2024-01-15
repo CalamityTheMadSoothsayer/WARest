@@ -24,6 +24,8 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                     // Remove everything before and including '='
                     string entityIdStr = queryString.Substring(equalSignIndex + 1);
 
+                    Console.WriteLine(entityIdStr);
+
                     // Parse the entityId value
                     if (long.TryParse(entityIdStr, out long entityId))
                     {
@@ -68,12 +70,12 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                     }
                     else
                     {
-                        ResponseBuilder.BuildAndSendResponse(session, 400, "status", "Invalid entityId value in the URL.");
+                        ResponseBuilder.BuildAndSendResponse(session, 500, "status", "Invalid entityId value in the URL.");
                     }
                 }
                 else
                 {
-                    ResponseBuilder.BuildAndSendResponse(session, 400, "status", "Missing '=' sign in the URL.");
+                    ResponseBuilder.BuildAndSendResponse(session, 500, "status", "Missing '=' sign in the URL.");
                 }
             }
             catch (Exception ex)
