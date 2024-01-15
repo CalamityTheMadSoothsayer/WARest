@@ -105,6 +105,9 @@ namespace WorldsAdriftServer.Handlers
                 }
                 else if(request.Method == "GET" && request.Url == "/componentData")
                 {
+                    var entityId = long.Parse(request.Url.Split("=")[1]);
+
+                    Console.WriteLine("ENT ID: " + entityId);
                     ComponentHandler.getComponentDate(this, request);
                 }
                 else if (request.Method == "POST" && request.Url == "/componentData")
