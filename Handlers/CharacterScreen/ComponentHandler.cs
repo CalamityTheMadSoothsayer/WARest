@@ -11,57 +11,48 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
 
         internal static void getComponentDate(HttpSession session, HttpRequest request)
         {
-            // Extract entityId from the request.Url manually
-            string queryString = request.Url.Split('=')[1];
+            var entityId = long.Parse(request.Url.Split("=")[1]);
 
-            Console.WriteLine(queryString);
+            Console.WriteLine("ENT ID: " + entityId);
             try
             {
-                // Parse the query string to get the entityId value
-                if (ParseQueryString(queryString, "entityId", out long entityId))
+                using (var connection = new NpgsqlConnection(connectionString))
                 {
-                    using (var connection = new NpgsqlConnection(connectionString))
+                    connection.Open();
+
+                    using (var cmd = new NpgsqlCommand("SELECT componentid, data FROM gameobjects WHERE entityid = @entityId", connection))
                     {
-                        connection.Open();
+                        cmd.Parameters.AddWithValue("entityId", entityId);
 
-                        using (var cmd = new NpgsqlCommand("SELECT componentid, data FROM gameobjects WHERE entityid = @entityId", connection))
+                        using (var reader = cmd.ExecuteReader())
                         {
-                            cmd.Parameters.AddWithValue("entityId", entityId);
+                            JObject responseData = new JObject();
 
-                            using (var reader = cmd.ExecuteReader())
+                            while (reader.Read())
                             {
-                                JObject responseData = new JObject();
+                                long componentId = reader.GetInt64(0);
+                                string jsonData = reader.GetString(1);
 
-                                while (reader.Read())
-                                {
-                                    long componentId = reader.GetInt64(0);
-                                    string jsonData = reader.GetString(1);
+                                // Add component data to the JSON response
+                                responseData.Add(new JProperty($"component_{componentId}", JObject.Parse(jsonData)));
+                            }
 
-                                    // Add component data to the JSON response
-                                    responseData.Add(new JProperty($"component_{componentId}", JObject.Parse(jsonData)));
-                                }
-
-                                if (responseData.Count > 0)
-                                {
-                                    // Build response with entityId as the root and components as keys
-                                    Utilities.ResponseBuilder.BuildAndSendResponse(
-                                        session,
-                                        (int)RequestRouterHandler.status,
-                                        "entityId", entityId,
-                                        "components", responseData
-                                    );
-                                }
-                                else
-                                {
-                                    ResponseBuilder.BuildAndSendResponse(session, 500, "status", "No data found for the specified entity.");
-                                }
+                            if (responseData.Count > 0)
+                            {
+                                // Build response with entityId as the root and components as keys
+                                Utilities.ResponseBuilder.BuildAndSendResponse(
+                                    session,
+                                    (int)RequestRouterHandler.status,
+                                    "entityId", entityId,
+                                    "components", responseData
+                                );
+                            }
+                            else
+                            {
+                                ResponseBuilder.BuildAndSendResponse(session, 500, "status", "No data found for the specified entity.");
                             }
                         }
                     }
-                }
-                else
-                {
-                    ResponseBuilder.BuildAndSendResponse(session, 400, "status", "Invalid or missing entityId in the query parameters.");
                 }
             }
             catch (Exception ex)
