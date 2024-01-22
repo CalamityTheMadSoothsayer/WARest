@@ -38,7 +38,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
 
                     string insertCharacterSql = @"
                         INSERT INTO characterdetails
-                        (id, userKey, characterUid, name, server, serverIdentifier, cosmetics, isMale, seenIntro, skippedTutorial, 
+                        (userKey, characterUid, name, server, serverIdentifier, cosmetics, isMale, seenIntro, skippedTutorial, 
                         universalColorsHairColorR, universalColorsHairColorG, universalColorsHairColorB, universalColorsHairColorA,
                         universalColorsSkinColorR, universalColorsSkinColorG, universalColorsSkinColorB, universalColorsSkinColorA,
                         universalColorsLipColorR, universalColorsLipColorG, universalColorsLipColorB, universalColorsLipColorA)
@@ -52,7 +52,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                     using (NpgsqlCommand insertCharacterCommand = new NpgsqlCommand(insertCharacterSql, connection))
                     {
                         // Add parameters to the command
-                        insertCharacterCommand.Parameters.AddWithValue("@Id", character.Id);
+                        // insertCharacterCommand.Parameters.AddWithValue("@Id", character.Id); // this keeps trying to put in 0, PK cant be same as others
                         insertCharacterCommand.Parameters.AddWithValue("@UserKey", userKey);
                         insertCharacterCommand.Parameters.AddWithValue("@CharacterUid", character.characterUid);
                         insertCharacterCommand.Parameters.AddWithValue("@Name", character.Name);
