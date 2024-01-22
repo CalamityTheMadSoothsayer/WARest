@@ -7,6 +7,8 @@ using System.Reflection;
 using WorldsAdriftServer.Objects.CharacterSelection;
 using WorldsAdriftServer.Objects.UnityObjects;
 using Newtonsoft.Json;
+using NpgsqlTypes;
+using System.Data;
 
 namespace WorldsAdriftServer.Handlers.CharacterScreen
 {
@@ -52,7 +54,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                     using (NpgsqlCommand insertCharacterCommand = new NpgsqlCommand(insertCharacterSql, connection))
                     {
                         // Add parameters to the command
-                        insertCharacterCommand.Parameters.AddWithValue("@Id", ""); // this keeps trying to put in 0, PK cant be same as others
+                        insertCharacterCommand.Parameters.Add("@Id", NpgsqlDbType.Integer).Direction = ParameterDirection.Output; // this keeps trying to put in 0, PK cant be same as others
                         insertCharacterCommand.Parameters.AddWithValue("@UserKey", userKey);
                         insertCharacterCommand.Parameters.AddWithValue("@CharacterUid", character.characterUid);
                         insertCharacterCommand.Parameters.AddWithValue("@Name", character.Name);
