@@ -40,12 +40,12 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
 
                     string insertCharacterSql = @"
                         INSERT INTO characterdetails
-                        (id, userKey, characterUid, name, server, serverIdentifier, cosmetics, isMale, seenIntro, skippedTutorial, 
+                        (userKey, characterUid, name, server, serverIdentifier, cosmetics, isMale, seenIntro, skippedTutorial, 
                         universalColorsHairColorR, universalColorsHairColorG, universalColorsHairColorB, universalColorsHairColorA,
                         universalColorsSkinColorR, universalColorsSkinColorG, universalColorsSkinColorB, universalColorsSkinColorA,
                         universalColorsLipColorR, universalColorsLipColorG, universalColorsLipColorB, universalColorsLipColorA)
                         VALUES
-                        (@Id, @UserKey, @CharacterUid, @Name, @Server, @ServerIdentifier, @Cosmetics, @IsMale, @SeenIntro, @SkippedTutorial,
+                        (@UserKey, @CharacterUid, @Name, @Server, @ServerIdentifier, @Cosmetics, @IsMale, @SeenIntro, @SkippedTutorial,
                         @HairColorR, @HairColorG, @HairColorB, @HairColorA,
                         @SkinColorR, @SkinColorG, @SkinColorB, @SkinColorA,
                         @LipColorR, @LipColorG, @LipColorB, @LipColorA)
@@ -54,7 +54,7 @@ namespace WorldsAdriftServer.Handlers.CharacterScreen
                     using (NpgsqlCommand insertCharacterCommand = new NpgsqlCommand(insertCharacterSql, connection))
                     {
                         // Add parameters to the command
-                        insertCharacterCommand.Parameters.Add("@Id", NpgsqlDbType.Integer).Direction = ParameterDirection.Output; // this keeps trying to put in 0, PK cant be same as others
+                        //insertCharacterCommand.Parameters.Add("@Id", NpgsqlDbType.Integer).Direction = ParameterDirection.Output; // this keeps trying to put in 0, PK cant be same as others
                         insertCharacterCommand.Parameters.AddWithValue("@UserKey", userKey);
                         insertCharacterCommand.Parameters.AddWithValue("@CharacterUid", character.characterUid);
                         insertCharacterCommand.Parameters.AddWithValue("@Name", character.Name);
