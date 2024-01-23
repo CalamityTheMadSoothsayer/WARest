@@ -178,7 +178,7 @@ namespace WorldsAdriftServer.Handlers
                     desiredServerName = dServerName.InnerText;
                     serverIdentity = dServerId.InnerText;
 
-                    privateKey = rsaPrivateKey.InnerText;
+                    privateKey = rsaPrivateKey.InnerXml;
                     publicKey = rsaPublicKey.InnerText;
 
                     return true;
