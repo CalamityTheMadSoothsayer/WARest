@@ -161,8 +161,11 @@ namespace WorldsAdriftServer.Handlers
                 XmlNode passwordNode = xmlDoc.SelectSingleNode("/configuration/database/password");
                 XmlNode dServerName = xmlDoc.SelectSingleNode("/configuration/database/desiredservername");
                 XmlNode dServerId = xmlDoc.SelectSingleNode("/configuration/database/serveridentity");
-                XmlNode rsaPrivateKey = xmlDoc.SelectSingleNode("/configuration/database/rsaPrivateKey");
-                XmlNode rsaPublicKey = xmlDoc.SelectSingleNode("/configuration/database/rsaPublicKey");
+
+                // Extract RSA keys
+                XmlNode rsaKeysNode = xmlDoc.SelectSingleNode("/configuration/rsaKeys");
+                XmlNode rsaPrivateKey = rsaKeysNode.SelectSingleNode("rsaPrivateKey");
+                XmlNode rsaPublicKey = rsaKeysNode.SelectSingleNode("rsaPublicKey");
 
                 // Check for null before accessing node values
                 if (serverNode != null && dbNode != null && userNode != null && passwordNode != null)
@@ -193,5 +196,6 @@ namespace WorldsAdriftServer.Handlers
                 return false;
             }
         }
+
     }
 }
