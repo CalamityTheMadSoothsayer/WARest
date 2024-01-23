@@ -136,7 +136,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error during decryption: {ex.Message}");
+                Console.WriteLine($"Error during decryption: {ex.Message} \n\r {privateKey}");
                 return string.Empty;
             }
         }
