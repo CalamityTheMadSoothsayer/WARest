@@ -21,17 +21,29 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                 if (request.Header(i).ToString().Contains("EncryptionKey"))
                 {
                     string headerParts = request.Header(i).ToString();
-
                     Console.WriteLine("HEADER: " + headerParts);
+
+                    // Extract the value between '<RSAKeyValue>' and '</RSAKeyValue>'
+                    int startIndex = headerParts.IndexOf("<RSAKeyValue>");
+                    int endIndex = headerParts.IndexOf("</RSAKeyValue>");
+                    if (startIndex != -1 && endIndex != -1)
+                    {
+                        providedEncryptionKey = headerParts.Substring(startIndex, endIndex - startIndex + "</RSAKeyValue>".Length);
+                    }
+                    else
+                    {
+                        // Handle the case where the RSAKeyValue tags are not found
+                        Console.WriteLine("Invalid EncryptionKey format in header. Command not processed.");
+                        return;
+                    }
+
 
                     break; // Exit the loop after finding the EncryptionKey header
                 }
             }
 
-            string formattedKeysForConfig = providedEncryptionKey.Replace("<RSAKeyValue>", "").Replace("</RSAKeyValue>", "").Replace("<Modulus>", "").Replace("</Modulus>", "").Replace("<Exponent>", "").Replace("</Exponent>", "");
-
             // Verify the encryption key
-            if (!VerifyEncryptionKey(formattedKeysForConfig, publicKey))
+            if (!VerifyEncryptionKey(providedEncryptionKey, publicKey))
             {
                 Console.WriteLine("KEY FROM HEADER: " + providedEncryptionKey);
                 Console.WriteLine("KEY FROM CONFIG: " + publicKey);
