@@ -20,15 +20,10 @@ namespace WorldsAdriftServer.Handlers.DataHandler
             {
                 if (request.Header(i).ToString().Contains("EncryptionKey"))
                 {
-                    string[] headerParts = request.Header(i).ToString().Split(':');
-                    if (headerParts.Length > 1)
-                    {
-                        providedEncryptionKey = headerParts[1];
-                    }
-                    else
-                    {
-                        providedEncryptionKey = headerParts[0];
-                    }
+                    string headerParts = request.Header(i).ToString();
+
+                    Console.WriteLine("HEADER: " + headerParts);
+
                     break; // Exit the loop after finding the EncryptionKey header
                 }
             }
