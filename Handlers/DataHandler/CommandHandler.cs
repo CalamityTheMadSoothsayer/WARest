@@ -67,11 +67,11 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     commandSuccesful = Connect();
                     if (commandSuccesful)
                     {
-                        new HttpResponse(200, "Connection Successful", "HTTP/1.1");
+                        session.SendResponse(new HttpResponse(200, "Connection Successful", "HTTP/1.1"));
                     }
                     else
                     {
-                        new HttpResponse(500, "Connection Failed", "HTTP/1.1");
+                        session.SendResponse(new HttpResponse(500, "Connection Failed", "HTTP/1.1"));
                     }
                     break;
                 case "restart":
@@ -79,11 +79,11 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     commandSuccesful = ReStartServer(server);
                     if (commandSuccesful)
                     {
-                        new HttpResponse(200, "Restart Successful", "HTTP/1.1");
+                        session.SendResponse(new HttpResponse(200, "Restart Successful", "HTTP/1.1"));
                     }
                     else
                     {
-                        new HttpResponse(500, "Restart Failed", "HTTP/1.1");
+                        session.SendResponse(new HttpResponse(500, "Restart Failed", "HTTP/1.1"));
                     }
                     break;
                 case "shutdown":
@@ -91,11 +91,11 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     commandSuccesful = StopServer(server);
                     if (commandSuccesful)
                     {
-                        new HttpResponse(200, "Shutdown Succesful", "HTTP/1.1");
+                        session.SendResponse(new HttpResponse(200, "Shutdown Succesful", "HTTP/1.1"));
                     }
                     else
                     {
-                        new HttpResponse(500, "Shutdown Failed", "HTTP/1.1");
+                        session.SendResponse(new HttpResponse(500, "Shutdown Failed", "HTTP/1.1"));
                     }
                     break;
                 case "start":
@@ -103,11 +103,11 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     commandSuccesful = StartServer(server);
                     if (commandSuccesful)
                     {
-                        new HttpResponse(200, "Start Successful", "HTTP/1.1");
+                        session.SendResponse(new HttpResponse(200, "Start Successful", "HTTP/1.1"));
                     }
                     else
                     {
-                        new HttpResponse(500, "Start Failed", "HTTP/1.1");
+                        session.SendResponse(new HttpResponse(500, "Start Failed", "HTTP/1.1"));
                     }
                     break;
             }
