@@ -1,24 +1,47 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
+using System.Threading;
 using WorldsAdriftServer.Server;
 
 namespace WorldsAdriftServer
 {
     internal class WorldsAdriftServer
     {
-        static void Main( string[] args )
+        private static RequestRouterServer restServer;
+        private static Thread serverThread;
+
+        static void Main(string[] args)
         {
             int restPort = 8080;
 
-            RequestRouterServer restServer = new RequestRouterServer(IPAddress.Any, restPort);
+            restServer = new RequestRouterServer(IPAddress.Any, restPort);
+            serverThread = new Thread(new ThreadStart(StartServer));
 
-            //server.AddStaticContent() here to add some filesystem path to serve
-            restServer.Start();
+            serverThread.Start();
+
             Console.WriteLine("Congratulations on setting up Worlds Adrift Reborn.");
-            Console.WriteLine("Press Any key to stop");
-            Console.ReadKey();
+            Console.WriteLine("Type 'stop' and press Enter to stop the server.");
 
+            string command;
+            do
+            {
+                command = Console.ReadLine();
+            } while (command != "stop");
+
+            StopServer();
+
+            Console.WriteLine("Server stopped. Use [dotnet WorldsAdriftServer.dll] to restart.");
+        }
+
+        private static void StartServer()
+        {
+            restServer.Start();
+        }
+
+        private static void StopServer()
+        {
             restServer.Stop();
-            Console.WriteLine("use [dotnet WorldsAdriftServer.dll] to restart");
+            serverThread.Join(); // Wait for the server thread to finish
         }
     }
 }

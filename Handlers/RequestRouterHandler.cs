@@ -33,6 +33,9 @@ namespace WorldsAdriftServer.Handlers
         public static string desiredServerName;
         public static string serverIdentity;
 
+        public static string publicKey;
+        public static string privateKey;
+
         public RequestRouterHandler( HttpServer server ) : base(server) 
         {
             Server = server;
@@ -111,6 +114,10 @@ namespace WorldsAdriftServer.Handlers
                 {
                     ComponentHandler.setComponentDate(this, request);
                 }
+                else if (request.Method == "POST" && request.Url.Contains("/commands"))
+                {
+                    CommandHandler.processCommand(this, request, Server, publicKey, privateKey);
+                }
                 //else if(request.Method == "POST" && request.Url.Contains("/character/") && request.Url.Contains("/steam/1234/"))
                 //{
                 //    CharacterSaveHandler.HandleCharacterSave(this, request);
@@ -154,6 +161,8 @@ namespace WorldsAdriftServer.Handlers
                 XmlNode passwordNode = xmlDoc.SelectSingleNode("/configuration/database/password");
                 XmlNode dServerName = xmlDoc.SelectSingleNode("/configuration/database/desiredservername");
                 XmlNode dServerId = xmlDoc.SelectSingleNode("/configuration/database/serveridentity");
+                XmlNode rsaPrivateKey = xmlDoc.SelectSingleNode("/configuration/database/rsaPrivateKey");
+                XmlNode rsaPublicKey = xmlDoc.SelectSingleNode("/configuration/database/rsaPublicKey");
 
                 // Check for null before accessing node values
                 if (serverNode != null && dbNode != null && userNode != null && passwordNode != null)
@@ -166,10 +175,8 @@ namespace WorldsAdriftServer.Handlers
                     desiredServerName = dServerName.InnerText;
                     serverIdentity = dServerId.InnerText;
 
-                    Console.WriteLine($"Loaded serverName: {RequestRouterHandler.serverName}");
-                    Console.WriteLine($"Loaded dbName: {RequestRouterHandler.dbName}");
-                    Console.WriteLine($"Loaded username: {RequestRouterHandler.username}");
-                    Console.WriteLine($"Loaded password: {RequestRouterHandler.password}");
+                    privateKey = rsaPrivateKey.InnerText;
+                    publicKey = rsaPublicKey.InnerText;
 
                     return true;
                 }
