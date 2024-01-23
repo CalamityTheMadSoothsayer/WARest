@@ -120,14 +120,27 @@ namespace WorldsAdriftServer.Handlers.DataHandler
 
         private static string Decrypt(string encryptedText, string privateKey)
         {
-            using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
+            try
             {
-                rsa.FromXmlString(privateKey);
-                byte[] encryptedBytes = Convert.FromBase64String(encryptedText);
-                byte[] decryptedBytes = rsa.Decrypt(encryptedBytes, false);
-                return Encoding.UTF8.GetString(decryptedBytes);
+                using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
+                {
+                    rsa.FromXmlString(privateKey);
+
+                    // Trim any leading/trailing whitespaces in the encryptedText
+                    encryptedText = encryptedText.Trim();
+
+                    byte[] encryptedBytes = Convert.FromBase64String(encryptedText);
+                    byte[] decryptedBytes = rsa.Decrypt(encryptedBytes, false);
+                    return Encoding.UTF8.GetString(decryptedBytes);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during decryption: {ex.Message}");
+                return string.Empty;
             }
         }
+
 
         private static bool Connect()
         {
