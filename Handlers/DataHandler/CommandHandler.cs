@@ -27,8 +27,8 @@ namespace WorldsAdriftServer.Handlers.DataHandler
             // Verify the encryption key
             if (!VerifyEncryptionKey(providedEncryptionKey, publicKey))
             {
-                Console.WriteLine(providedEncryptionKey);
-                Console.WriteLine(publicKey);
+                Console.WriteLine("KEY FROM HEADER: " + providedEncryptionKey);
+                Console.WriteLine("KEY FROM CONFIG: " + publicKey);
                 Console.WriteLine("Invalid encryption key. Command not processed.");
                 return;
             }
