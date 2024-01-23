@@ -13,16 +13,25 @@ namespace WorldsAdriftServer.Handlers.DataHandler
     {
         internal static void processCommand(HttpSession session, HttpRequest request, HttpServer server, string publicKey, string privateKey)
         {
-            string encryptedCommand = request.Body;
             string providedEncryptionKey = "";
 
             for (int i = 0; i < (int)request.Headers; i++)
             {
                 if (request.Header(i).ToString().Contains("EncryptionKey"))
                 {
-                    providedEncryptionKey = request.Header(i).ToString().Split(':')[1];
+                    string[] headerParts = request.Header(i).ToString().Split(':');
+                    if (headerParts.Length > 1)
+                    {
+                        providedEncryptionKey = headerParts[1];
+                    }
+                    else
+                    {
+                        providedEncryptionKey = headerParts[0];
+                    }
+                    break; // Exit the loop after finding the EncryptionKey header
                 }
             }
+
 
             // Verify the encryption key
             if (!VerifyEncryptionKey(providedEncryptionKey, publicKey))
