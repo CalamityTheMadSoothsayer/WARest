@@ -13,6 +13,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
     {
         internal static void processCommand(HttpSession session, HttpRequest request, HttpServer server, string publicKey, string privateKey)
         {
+            string encryptedCommand = request.Body;
             string providedEncryptionKey = "";
 
             for (int i = 0; i < (int)request.Headers; i++)
