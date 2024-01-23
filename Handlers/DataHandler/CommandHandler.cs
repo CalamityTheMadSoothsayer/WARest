@@ -33,9 +33,10 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                 }
             }
 
+            string formattedKeysForConfig = providedEncryptionKey.Replace("<RSAKeyValue>", "").Replace("</RSAKeyValue>", "").Replace("<Modulus>", "").Replace("</Modulus>", "").Replace("<Exponent>", "").Replace("</Exponent>", "");
 
             // Verify the encryption key
-            if (!VerifyEncryptionKey(providedEncryptionKey, publicKey))
+            if (!VerifyEncryptionKey(formattedKeysForConfig, publicKey))
             {
                 Console.WriteLine("KEY FROM HEADER: " + providedEncryptionKey);
                 Console.WriteLine("KEY FROM CONFIG: " + publicKey);
