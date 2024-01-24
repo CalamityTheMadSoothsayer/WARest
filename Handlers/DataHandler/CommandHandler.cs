@@ -63,10 +63,11 @@ namespace WorldsAdriftServer.Handlers.DataHandler
             switch (decryptedCommand.ToLower())
             {
                 case "connect":
-                    Console.Write("Handling Connection request...");
-                    commandSuccesful = Connect();
+                    Console.Write("Handling Connection request...\n\r");
+                    commandSuccesful = Connect(); // returns true for now. may add more functionality later.
                     if (commandSuccesful)
                     {
+                        Console.WriteLine("WAR tool connected.");
                         session.SendResponse(new HttpResponse(200, "Connection Successful", "HTTP/1.1"));
                     }
                     else
