@@ -1,4 +1,5 @@
-﻿using NetCoreServer;
+﻿using Azure;
+using NetCoreServer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -68,11 +69,18 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     if (commandSuccesful)
                     {
                         Console.WriteLine("WAR tool connected.");
-                        session.SendResponse(new HttpResponse(200, "Connection Successful", "HTTP/1.1"));
+                        // Use ResponseBuilder to construct and send the response
+                        Utilities.ResponseBuilder.BuildAndSendResponse(
+                            session,
+                            200
+                        );
                     }
                     else
                     {
-                        session.SendResponse(new HttpResponse(500, "Connection Failed", "HTTP/1.1"));
+                        Utilities.ResponseBuilder.BuildAndSendResponse(
+                            session,
+                            500
+                        );
                     }
                     break;
                 case "restart":
@@ -80,11 +88,14 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     commandSuccesful = ReStartServer(server);
                     if (commandSuccesful)
                     {
-                        session.SendResponse(new HttpResponse(200, "Restart Successful", "HTTP/1.1"));
+                        Utilities.ResponseBuilder.BuildAndSendResponse(
+                            session,
+                            200
+                        );
                     }
                     else
                     {
-                        session.SendResponse(new HttpResponse(500, "Restart Failed", "HTTP/1.1"));
+                        Utilities.ResponseBuilder.BuildAndSendResponse(session, 500);
                     }
                     break;
                 case "shutdown":
@@ -92,11 +103,11 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     commandSuccesful = StopServer(server);
                     if (commandSuccesful)
                     {
-                        session.SendResponse(new HttpResponse(200, "Shutdown Succesful", "HTTP/1.1"));
+                        Utilities.ResponseBuilder.BuildAndSendResponse(session, 200);
                     }
                     else
                     {
-                        session.SendResponse(new HttpResponse(500, "Shutdown Failed", "HTTP/1.1"));
+                        Utilities.ResponseBuilder.BuildAndSendResponse(session, 500);
                     }
                     break;
                 case "start":
@@ -104,11 +115,11 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     commandSuccesful = StartServer(server);
                     if (commandSuccesful)
                     {
-                        session.SendResponse(new HttpResponse(200, "Start Successful", "HTTP/1.1"));
+                        Utilities.ResponseBuilder.BuildAndSendResponse(session, 200);
                     }
                     else
                     {
-                        session.SendResponse(new HttpResponse(500, "Start Failed", "HTTP/1.1"));
+                        Utilities.ResponseBuilder.BuildAndSendResponse(session, 500);
                     }
                     break;
             }
