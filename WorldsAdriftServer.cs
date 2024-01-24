@@ -9,6 +9,7 @@ namespace WorldsAdriftServer
     {
         private static RequestRouterServer restServer;
         private static Thread serverThread;
+        public static CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
         static void Main(string[] args)
         {

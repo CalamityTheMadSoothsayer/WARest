@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace WorldsAdriftServer.Handlers.DataHandler
@@ -68,7 +69,7 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     commandSuccesful = Connect(); // returns true for now. may add more functionality later.
                     if (commandSuccesful)
                     {
-                        Console.WriteLine("WAR tool connected.");
+                        Console.WriteLine("WAR tool connected. \n\r");
                         // Use ResponseBuilder to construct and send the response
                         Utilities.ResponseBuilder.BuildAndSendResponse(
                             session,
@@ -84,10 +85,11 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     }
                     break;
                 case "restart":
-                    Console.WriteLine("Restarting server...");
+                    Console.WriteLine("Restarting server...\n\r");
                     commandSuccesful = ReStartServer(server);
                     if (commandSuccesful)
                     {
+                        Console.WriteLine("Server Restarted.\n\r");
                         Utilities.ResponseBuilder.BuildAndSendResponse(
                             session,
                             200
@@ -99,10 +101,24 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     }
                     break;
                 case "shutdown":
-                    Console.WriteLine("Shutting down server...");
+                    Console.WriteLine("Shutting down server...\n\r");
+                    commandSuccesful = ShutdownServer(server);
+                    if (commandSuccesful)
+                    {
+                        Console.WriteLine("Server shutdown.\n\r");
+                        Utilities.ResponseBuilder.BuildAndSendResponse(session, 200);
+                    }
+                    else
+                    {
+                        Utilities.ResponseBuilder.BuildAndSendResponse(session, 500);
+                    }
+                    break;
+                case "stop":
+                    Console.WriteLine("Stopping server...\n\r");
                     commandSuccesful = StopServer(server);
                     if (commandSuccesful)
                     {
+                        Console.WriteLine("Server stopped.\n\r");
                         Utilities.ResponseBuilder.BuildAndSendResponse(session, 200);
                     }
                     else
@@ -111,10 +127,11 @@ namespace WorldsAdriftServer.Handlers.DataHandler
                     }
                     break;
                 case "start":
-                    Console.WriteLine("Starting server...");
+                    Console.WriteLine("Starting server...\n\r");
                     commandSuccesful = StartServer(server);
                     if (commandSuccesful)
                     {
+                        Console.WriteLine("Server started..\n\r");
                         Utilities.ResponseBuilder.BuildAndSendResponse(session, 200);
                     }
                     else
@@ -161,8 +178,6 @@ namespace WorldsAdriftServer.Handlers.DataHandler
 
         private static bool ReStartServer(HttpServer server)
         {
-            // Implement logic to restart the server
-            Console.WriteLine("Restarting server...");
             try
             {
                 server.Restart();
@@ -174,10 +189,24 @@ namespace WorldsAdriftServer.Handlers.DataHandler
             }
         }
 
+        private static bool ShutdownServer(HttpServer server)
+        {
+            
+            try
+            {
+                WorldsAdriftServer.cancellationTokenSource.Cancel();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private static bool StopServer(HttpServer server)
         {
-            // Implement logic to stop the server
-            Console.WriteLine("Stopping server...");
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
             try
             {
                 server.Stop();
@@ -191,8 +220,6 @@ namespace WorldsAdriftServer.Handlers.DataHandler
 
         private static bool StartServer(HttpServer server)
         {
-            // Implement logic to start the server
-            Console.WriteLine("Starting server...");
             try
             {
                 server.Start();
